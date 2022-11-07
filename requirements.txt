@@ -1,0 +1,5 @@
+autocorrect==2.6.1
+nltk==3.7
+pandas==1.4.3
+regex==2022.7.9
+xlrd==2.0.1
