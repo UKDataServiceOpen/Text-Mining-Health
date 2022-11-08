@@ -1,0 +1,182 @@
+---
+title: "Text_Mining_Demo"
+output: html_document
+date: "`r Sys.Date()`"
+author: Nadia Kennar 
+toc: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Install and Load Packages
+
+
+```{r}
+# Install
+install.packages("tm")  # for text mining
+install.packages("SnowballC") # for text stemming
+install.packages("wordcloud") # word-cloud generator 
+install.packages("RColorBrewer") # color palettes
+install.packages("syuzhet") # for sentiment analysis
+install.packages("ggplot2") # for plotting graphs
+install.packages("dplyr")  # for data manipulationn
+install.packages("readr") # for reading in files
+install.packages("tidytext") #for tokenisation, using dplyr, ggplot2 and other tidy tools 
+install.packages("stringr") # for extracting matched patterns in strings 
+
+# Load
+library(tm)
+library(SnowballC)
+library(wordcloud)
+library(RColorBrewer)
+library(syuzhet)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(tidytext)
+library(stringr)
+
+
+```
+
+
+
+# Load in the dataset 
+
+```{r}
+foot_mouth_df <- read_csv("code/data/foot_mouth/text.csv")
+head(foot_mouth_df)
+```
+
+
+
+# Pre-processing 
+
+```{r}
+# Renaming columns 
+names(foot_mouth_df)[1] <- "Number"
+names(foot_mouth_df)[2] <- "Filename"
+names(foot_mouth_df)[3] <- "Everything_else"
+head(foot_mouth_df)
+
+
+#Splitting Datagrames
+diary_file <- foot_mouth_df[1:39,]
+group_int_file <- foot_mouth_df[40:87,]
+
+head(diary_file)
+
+
+#Adding Date Column 
+  # first to the diary file 
+diary_file$Date <- str_extract(diary_file$Everything_else, "(\\d{1,2}[/\\.-][ ]?)?(\\d{1,2}[ ]*[/\\.-]|January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Febr|Mar|Apr|Jun|Jul|Aug|Sept|Sep|Oct|Nov|Dec|Jan\\.|Feb\\.|Febr\\.|Mar\\.|Apr\\.|Jun\\.|Jul\\.|Aug\\.|Sept\\.|Sep\\.|Oct\\.|Nov\\.|Dec\\.)[ ]*[']?\\d{2,4}")
+
+head(diary_file)
+
+  # then to the group/interview files
+group_int_file$Date <- str_extract(group_int_file$Everything_else, "(\\d{1,2}[/\\.-][ ]?)?(\\d{1,2}[ ]*[/\\.-]|January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Febr|Mar|Apr|Jun|Jul|Aug|Sept|Sep|Oct|Nov|Dec|Jan\\.|Feb\\.|Febr\\.|Mar\\.|Apr\\.|Jun\\.|Jul\\.|Aug\\.|Sept\\.|Sep\\.|Oct\\.|Nov\\.|Dec\\.)[ ]*[']?\\d{2,4}")
+
+head(group_int_file)
+
+
+# Append files 
+new_foot_mouth <- rbind(diary_file, group_int_file)
+head(new_foot_mouth)
+
+
+# Adding Gender Column and remove colon 
+#unlist(lapply(strsplit(foo, ':', fixed = TRUE), '[', 2))
+new_foot_mouth$Gender <- str_extract(new_foot_mouth$Everything_else, "M|F")
+head(new_foot_mouth)
+
+
+#Adding Occupation Column 
+new_foot_mouth$Occupation <-as.integer(sub(".*?Group.*?(\\d+).*", "\\1", new_foot_mouth$Everything_else))
+head(new_foot_mouth)
+```
+
+
+
+
+## Processing 
+
+Processing steps
+
+- Tokenisation, (or splitting text into various kinds of 'short things' that can be statistically analysed).
+- Standardising the next (including converting uppercase to lower, correcting spelling, find-and-replace operations to remove abbreviations, etc.).
+- Removing irrelevancies (anything from punctuation to stopwords like 'the' or 'to' that are unhelpful for many kinds of analysis).
+- Consolidating (including stemming and lemmatisation that strip words back to their 'root').
+- Basic NLP (that put some of the small things back together into logically useful medium things, like multi-word noun or verb phrases and proper names).
+
+In practice, most text-mining work will require that any given corpus undergo multiple steps, but the exact steps and the exact order of steps depends on the desired analysis to be done. Thus, some of the examples that follow will use the raw text corpus as an input to the process while others use a processed corpus as an input.
+
+As a side note, it is good practice to create new variables whenever you manipulate an existing variable rather than write over the original. This means that you keep the original and can go back to it anytime you need to if you want to try a different manipulation or correct an error. You will see how this works as we progress through the processing steps.
+
+Since I am using this first type of processing to look for potential points for analysis, I will just stick to: word-tokenisation, basic standardisation and stemming
+
+
+# Tokenisation 
+
+Our first step is to cut our 'one big thing' into tokens, or 'lots of little things'. 
+
+Whether you have one big file or many smaller ones, most text-mining work will also want to divide the corpus into what are known as 'tokens'. These 'tokens' are the unit of analysis, which might be chapters, sections, paragraphs, sentences, words, or something else.
+
+Since we have one file already loaded as a corpus, we can skip the right to tokenising that text into sentences and words. Both options are functions available through the .... package that we imported earlier. These are both useful tokens in their own way, so we will see how to produce both kinds.
+
+We start by dividing our corpus into words, splitting the string into substrings whenever 'word_tokenize' detects a word.
+
+Let's try that. But this time, let's just have a look at the first 100 things it finds instead of the entire text. Run/Shift+Enter.
+
+```{r}
+#Since this method takes basically adding columns every time we do a new step, I will do processing on original foot_mouth_df
+# Then I will append anything usefuul onto the modified 'new_foot_mouth' DataFrame for the extraction process!
+
+# 1) Words 
+
+foot_mouth_df %>% unnest_tokens(output = words, 
+                   token = "words",
+                   input = Everything_else)
+
+
+head(foot_mouth_df$tokenised_words)
+
+#The issue is this code lists the token as a column, rather than splitting the string into a substring and applying this over each row. I think you can 
+
+```
+
+
+
+
+
+# Standardising 
+
+If we want to focus on the 'bag of words' approach, we don't really care about uppercase or lowercase distinctions. For example, we want 'Privacy' to count as the same word as 'privacy', rather than as two different words.
+
+We can remove all uppercase letters with a ......
+. Do this in the next code cell, again returning just the first 100 items instead of the whole thing.
+
+Do the Run/Shift+Enter thing.
+
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

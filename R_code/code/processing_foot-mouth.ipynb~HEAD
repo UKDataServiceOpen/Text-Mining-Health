@@ -1,0 +1,1598 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "![UKDS Logo](images/UKDS_Logos_Col_Grey_300dpi.png)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "slideshow": {
+     "slide_type": "-"
+    }
+   },
+   "source": [
+    "# Text-mining: Basics"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "toc": true
+   },
+   "source": [
+    "<h1>Table of Contents<span class=\"tocSkip\"></span></h1>\n",
+    "<div class=\"toc\"><ul class=\"toc-item\"><li><span><a href=\"#Retrieval\" data-toc-modified-id=\"Retrieval-1\"><span class=\"toc-item-num\">1&nbsp;&nbsp;</span>Retrieval</a></span></li><li><span><a href=\"#Accessing-rows,-columns-and-cells\" data-toc-modified-id=\"Accessing-rows,-columns-and-cells-2\"><span class=\"toc-item-num\">2&nbsp;&nbsp;</span>Accessing rows, columns and cells</a></span><ul class=\"toc-item\"><li><span><a href=\"#Accessing-rows-by-index\" data-toc-modified-id=\"Accessing-rows-by-index-2.1\"><span class=\"toc-item-num\">2.1&nbsp;&nbsp;</span>Accessing rows by index</a></span></li><li><span><a href=\"#Accessing-rows-by-label\" data-toc-modified-id=\"Accessing-rows-by-label-2.2\"><span class=\"toc-item-num\">2.2&nbsp;&nbsp;</span>Accessing rows by label</a></span></li><li><span><a href=\"#Accessing-columns-by-index-and-label\" data-toc-modified-id=\"Accessing-columns-by-index-and-label-2.3\"><span class=\"toc-item-num\">2.3&nbsp;&nbsp;</span>Accessing columns by index and label</a></span></li><li><span><a href=\"#Accessing-individual-cells-by-using-both-rows-and-columns\" data-toc-modified-id=\"Accessing-individual-cells-by-using-both-rows-and-columns-2.4\"><span class=\"toc-item-num\">2.4&nbsp;&nbsp;</span>Accessing individual cells by using both rows and columns</a></span></li><li><span><a href=\"#Saving-the-accessed-items-as-a-new-variable\" data-toc-modified-id=\"Saving-the-accessed-items-as-a-new-variable-2.5\"><span class=\"toc-item-num\">2.5&nbsp;&nbsp;</span>Saving the accessed items as a new variable</a></span></li></ul></li><li><span><a href=\"#Processing\" data-toc-modified-id=\"Processing-3\"><span class=\"toc-item-num\">3&nbsp;&nbsp;</span>Processing</a></span><ul class=\"toc-item\"><li><span><a href=\"#Tokenisation\" data-toc-modified-id=\"Tokenisation-3.1\"><span class=\"toc-item-num\">3.1&nbsp;&nbsp;</span>Tokenisation</a></span></li><li><span><a href=\"#Standardising\" data-toc-modified-id=\"Standardising-3.2\"><span class=\"toc-item-num\">3.2&nbsp;&nbsp;</span>Standardising</a></span><ul class=\"toc-item\"><li><span><a href=\"#Remove-uppercase-letters\" data-toc-modified-id=\"Remove-uppercase-letters-3.2.1\"><span class=\"toc-item-num\">3.2.1&nbsp;&nbsp;</span>Remove uppercase letters</a></span></li><li><span><a href=\"#Spelling-correction\" data-toc-modified-id=\"Spelling-correction-3.2.2\"><span class=\"toc-item-num\">3.2.2&nbsp;&nbsp;</span>Spelling correction</a></span></li><li><span><a href=\"#RegEx-replacements\" data-toc-modified-id=\"RegEx-replacements-3.2.3\"><span class=\"toc-item-num\">3.2.3&nbsp;&nbsp;</span>RegEx replacements</a></span></li></ul></li><li><span><a href=\"#Removing-irrelevancies\" data-toc-modified-id=\"Removing-irrelevancies-3.3\"><span class=\"toc-item-num\">3.3&nbsp;&nbsp;</span>Removing irrelevancies</a></span><ul class=\"toc-item\"><li><span><a href=\"#Remove-punctuation\" data-toc-modified-id=\"Remove-punctuation-3.3.1\"><span class=\"toc-item-num\">3.3.1&nbsp;&nbsp;</span>Remove punctuation</a></span></li><li><span><a href=\"#Stopwords\" data-toc-modified-id=\"Stopwords-3.3.2\"><span class=\"toc-item-num\">3.3.2&nbsp;&nbsp;</span>Stopwords</a></span></li></ul></li><li><span><a href=\"#Consolidation\" data-toc-modified-id=\"Consolidation-3.4\"><span class=\"toc-item-num\">3.4&nbsp;&nbsp;</span>Consolidation</a></span><ul class=\"toc-item\"><li><span><a href=\"#Stemming-words\" data-toc-modified-id=\"Stemming-words-3.4.1\"><span class=\"toc-item-num\">3.4.1&nbsp;&nbsp;</span>Stemming words</a></span></li><li><span><a href=\"#Lemmatisation\" data-toc-modified-id=\"Lemmatisation-3.4.2\"><span class=\"toc-item-num\">3.4.2&nbsp;&nbsp;</span>Lemmatisation</a></span></li></ul></li></ul></li><li><span><a href=\"#Conclusions\" data-toc-modified-id=\"Conclusions-4\"><span class=\"toc-item-num\">4&nbsp;&nbsp;</span>Conclusions</a></span></li><li><span><a href=\"#Further-reading-and-resources\" data-toc-modified-id=\"Further-reading-and-resources-5\"><span class=\"toc-item-num\">5&nbsp;&nbsp;</span>Further reading and resources</a></span></li></ul></div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\n",
+    "There is a table of contents provided here at the top of the notebook, but you can also access this menu at any point by clicking the Table of Contents button on the top toolbar (an icon with four horizontal bars, if unsure hover your mouse over the buttons). "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Retrieval\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The first step in text-mining, or any form of data-mining, is retrieving a data set to work with. Within text-mining, or any language analysis context, one data set is usually referred to as 'a corpus' while multiple data sets are referred to as 'corpora'. 'Corpus' is a latin-root word and therefore has a funny plural. \n",
+    "\n",
+    "For text-mining, a corpus can be:\n",
+    "- a set of tweets, \n",
+    "- the full text of an 18th centrury novel,\n",
+    "- the contents of a page in the dictionary, \n",
+    "- minutes of local council meetings, \n",
+    "- random gibberish letters and numbers, or\n",
+    "- just about anything else in text format. \n",
+    "\n",
+    "\n",
+    "Retrieval is a very important step, but it is not the focus of this particular training series. If you are interested in creating a corpus from internet data, then you may want to check out our <a href=\"https://github.com/UKDataServiceOpen/web-scraping\" target=_blank>previous NFoD training series</a> that covers Web-scraping (available as recordings of webinars or as a code-along jupyter notebook like this one) and API's (also as recording or jupyter notebook). Both of these demonstrate and discuss ways to get data from the internet that you could use to build a corpus. \n",
+    "\n",
+    "Instead, for the purposes of this session, we will assume that you already have a corpus to analyse. This is easy for us to assume, because we have provided a sample text file that we can use as a corpus for these exercises. \n",
+    "\n",
+    "First, let's check that it is there. To do that, click in the code cell below and hit the 'Run' button at the top of this page or by holding down the 'Shift' key and hitting the 'Enter' key. \n",
+    "\n",
+    "For the rest of this notebook, I will use 'Run/Shift+Enter' as short hand for 'click in the code cell below and hit the 'Run' button at the top of this page or by hold down the 'Shift' key while hitting the 'Enter' key'. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "ERROR: Invalid requirement: '#'\n",
+      "[nltk_data] Downloading package punkt to\n",
+      "[nltk_data]     C:\\Users\\L_Pel\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]   Package punkt is already up-to-date!\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "2. One of the files in ./data is... foot_mouth_original.xls\n",
+      "2. One of the files in ./data is... text.csv\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "# It is good practice to always start by importing the modules and packages you will need. \n",
+    "\n",
+    "import os                         # os is a module for navigating your machine (e.g., file directories).\n",
+    "import nltk                       # nltk stands for natural language tool kit and is useful for text-mining. \n",
+    "import re                         # re is for regular expressions, which we use later \n",
+    "import pandas as pd               # we need pandas to import the foot_mouth_original.xls file\n",
+    "! pip install xlrd                # apparently we also need xlrd to read the .xls file because pandas is not old school\n",
+    "import xlrd                       # le sigh\n",
+    "\n",
+    "nltk.download('punkt')\n",
+    "from nltk import word_tokenize                                           # importing the word_tokenize function from nltk\n",
+    "\n",
+    "# List all of the files in the \"data\" folder that is provided to you\n",
+    "print(\"\")\n",
+    "for file in os.listdir(\"./data/foot_mouth\"):\n",
+    "   print(\"2. One of the files in ./data is...\", file)\n",
+    "print(\"\")\n"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "metadata": {},
+   "source": [
+    "_______________________________________________________________________________________________________________________________\n",
+    "Great! We have imported our modules and checked that the file we want to use is available. \n",
+    "\n",
+    "Now we need to load that text file into a variable that we can work with in python. Time to Run/Shift+Enter again!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "   Unnamed: 0                0  \\\n",
+      "0           0  5407diary02.rtf   \n",
+      "1           1  5407diary03.rtf   \n",
+      "2           2  5407diary07.rtf   \n",
+      "3           3  5407diary08.rtf   \n",
+      "4           4  5407diary09.rtf   \n",
+      "5           5  5407diary10.rtf   \n",
+      "6           6  5407diary13.rtf   \n",
+      "7           7  5407diary14.rtf   \n",
+      "8           8  5407diary15.rtf   \n",
+      "9           9  5407diary16.rtf   \n",
+      "\n",
+      "                                                   1  \n",
+      "0  \\n\\nInformation about diarist\\nDate of birth: ...  \n",
+      "1  Information about diarist\\nDate of birth: 1966...  \n",
+      "2  \\n\\nInformation about diarist\\nDate of birth: ...  \n",
+      "3  Information about diarist\\nDate of birth: 1963...  \n",
+      "4  Information about diarist\\nDate of birth: 1981...  \n",
+      "5  Information about diarist\\nDate of birth: 1937...  \n",
+      "6  Information about diarist\\nDate of birth: 1947...  \n",
+      "7  \\nInformation about diarist\\nDate of birth: 19...  \n",
+      "8  Information about diarist\\nDate of birth: 1949...  \n",
+      "9  \\nInformation about diarist\\nDate of birth: 19...  \n"
+     ]
+    }
+   ],
+   "source": [
+    "foot_mouth_df = pd.read_csv ('../code/data/foot_mouth/text.csv')\n",
+    "print (foot_mouth_df[:10])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_______________________________________________________________________________________________________________________________\n",
+    "Right. We have three columns, one is a number, one is the name of the original .rtf file that the text came from, and one is the text. \n",
+    "\n",
+    "Looks a bit messy. \n",
+    "\n",
+    "Before we go further, it helps to know what kind of variable foot_mouth_df is. Run/Shift+Enter the next code block to find out!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "pandas.core.frame.DataFrame"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "type(foot_mouth_df)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_______________________________________________________________________________________________________________________________\n",
+    "This tells us that 'foot_mouth_df' is a pandas DataFrame. That is not a bad thing. \n",
+    "\n",
+    "Congratulations! We are done with the retreival portion of this process. The rest won't be quite so straightforward because next up... Processing. \n",
+    "\n",
+    "Processing is about cleaning, correcting, standardizing and formatting the raw data returned from the retrieval process. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Accessing rows, columns and cells\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In order to work with the contents of a data frame, we need to be able to access only some of it at a time. To do that, we need to call the data frame and then tell it what parts to return to us. We can save what is returned as a variable, or print it, or write it to a .csv file or something. For now, lets just see it on screen. \n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Accessing rows by index\n",
+    "\n",
+    "Let's start by accessing just rows. \n",
+    "\n",
+    "Th approach uses the \"index\", \"indexed location\" or \"index position\" and works on the principle of counting. If you reorder them, it will influence what is returned. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Unnamed: 0</th>\n",
+       "      <th>0</th>\n",
+       "      <th>1</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>5407diary02.rtf</td>\n",
+       "      <td>\\n\\nInformation about diarist\\nDate of birth: ...</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   Unnamed: 0                0  \\\n",
+       "0           0  5407diary02.rtf   \n",
+       "\n",
+       "                                                   1  \n",
+       "0  \\n\\nInformation about diarist\\nDate of birth: ...  "
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "foot_mouth_df[:1]                 # This is how you access a single row in a data frame\n",
+    "                                 # NOTE: there is no comma anywhere inside the square brackets.\n",
+    "                                 # The importance of that becomes clearer later. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Unnamed: 0</th>\n",
+       "      <th>0</th>\n",
+       "      <th>1</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>5407diary02.rtf</td>\n",
+       "      <td>\\n\\nInformation about diarist\\nDate of birth: ...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>1</td>\n",
+       "      <td>5407diary03.rtf</td>\n",
+       "      <td>Information about diarist\\nDate of birth: 1966...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2</td>\n",
+       "      <td>5407diary07.rtf</td>\n",
+       "      <td>\\n\\nInformation about diarist\\nDate of birth: ...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>3</td>\n",
+       "      <td>5407diary08.rtf</td>\n",
+       "      <td>Information about diarist\\nDate of birth: 1963...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>4</td>\n",
+       "      <td>5407diary09.rtf</td>\n",
+       "      <td>Information about diarist\\nDate of birth: 1981...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>82</th>\n",
+       "      <td>82</td>\n",
+       "      <td>5407int49.rtf</td>\n",
+       "      <td>\\nDate of Interview: 22/01/02\\n\\nInformation a...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>83</th>\n",
+       "      <td>83</td>\n",
+       "      <td>5407int52.rtf</td>\n",
+       "      <td>\\nDate of Interview: 08/01/02\\n\\nInformation a...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>84</th>\n",
+       "      <td>84</td>\n",
+       "      <td>5407int53.rtf</td>\n",
+       "      <td>\\nDate of Interview: 21/01/02\\n\\nInformation a...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>85</th>\n",
+       "      <td>85</td>\n",
+       "      <td>5407int54.rtf</td>\n",
+       "      <td>\\nDate of Interview: 17/01/02\\n\\nInformation a...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>86</th>\n",
+       "      <td>86</td>\n",
+       "      <td>5407int55.rtf</td>\n",
+       "      <td>\\nDate of Interview: 27/02/02\\n\\nInformation a...</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>87 rows × 3 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    Unnamed: 0                0  \\\n",
+       "0            0  5407diary02.rtf   \n",
+       "1            1  5407diary03.rtf   \n",
+       "2            2  5407diary07.rtf   \n",
+       "3            3  5407diary08.rtf   \n",
+       "4            4  5407diary09.rtf   \n",
+       "..         ...              ...   \n",
+       "82          82    5407int49.rtf   \n",
+       "83          83    5407int52.rtf   \n",
+       "84          84    5407int53.rtf   \n",
+       "85          85    5407int54.rtf   \n",
+       "86          86    5407int55.rtf   \n",
+       "\n",
+       "                                                    1  \n",
+       "0   \\n\\nInformation about diarist\\nDate of birth: ...  \n",
+       "1   Information about diarist\\nDate of birth: 1966...  \n",
+       "2   \\n\\nInformation about diarist\\nDate of birth: ...  \n",
+       "3   Information about diarist\\nDate of birth: 1963...  \n",
+       "4   Information about diarist\\nDate of birth: 1981...  \n",
+       "..                                                ...  \n",
+       "82  \\nDate of Interview: 22/01/02\\n\\nInformation a...  \n",
+       "83  \\nDate of Interview: 08/01/02\\n\\nInformation a...  \n",
+       "84  \\nDate of Interview: 21/01/02\\n\\nInformation a...  \n",
+       "85  \\nDate of Interview: 17/01/02\\n\\nInformation a...  \n",
+       "86  \\nDate of Interview: 27/02/02\\n\\nInformation a...  \n",
+       "\n",
+       "[87 rows x 3 columns]"
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "foot_mouth_df[:100]                 # Try entering different values inside the square brackets.\n",
+    "                                # What happens when you enter 0? Or 100? \n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Unnamed: 0</th>\n",
+       "      <th>0</th>\n",
+       "      <th>1</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>86</th>\n",
+       "      <td>86</td>\n",
+       "      <td>5407int55.rtf</td>\n",
+       "      <td>\\nDate of Interview: 27/02/02\\n\\nInformation a...</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    Unnamed: 0              0  \\\n",
+       "86          86  5407int55.rtf   \n",
+       "\n",
+       "                                                    1  \n",
+       "86  \\nDate of Interview: 27/02/02\\n\\nInformation a...  "
+      ]
+     },
+     "execution_count": 22,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Here are some examples of how you can use the index to access one or more rows in multiple ways. \n",
+    "# These lines of code won't work unless you create a dataframe called 'df' \n",
+    "# but you can try them all out on foot_mouth_df to see what they do. \n",
+    "\n",
+    "foot_mouth_df.iloc[2]        # Select Row by Index          - comes out in a not too easy to read format though!\n",
+    "foot_mouth_df.iloc[[2]]      # Select Row by READABLE Index - note the double brackets!\n",
+    "foot_mouth_df.iloc[[2,3,6]]  # Select Rows by Index List    - to do this you NEED the double brackets to not get an error!\n",
+    "\n",
+    "# For the following you can only use single brackets (they will all have readable format though)\n",
+    "\n",
+    "foot_mouth_df.iloc[1:5]      # Select Rows by Integer Index Range\n",
+    "foot_mouth_df.iloc[:1]       # Select First Row\n",
+    "foot_mouth_df.iloc[:3]       # Select First 3 Rows\n",
+    "foot_mouth_df.iloc[-1:]      # Select Last Row\n",
+    "foot_mouth_df.iloc[-3:]      # Select Last 3 Row\n",
+    "foot_mouth_df.iloc[::2]      # Selects alternate rows\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "It may help to point out that the colon (the :) kind of means \"everything up to and including\". \n",
+    "\n",
+    "Compare what happens when you enter these two:\n",
+    "> foot_mouth_df [2]\n",
+    "\n",
+    "> foot_mouth_df [:2]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Accessing rows by label\n",
+    "\n",
+    "As well as index, you can access rows by their label. Our data does not have names (in the sense they are not named with \"Julia\" or \"row 1\" or anything that is a string. If you work with a data frame that has strings as labels, just put the row index label inside of quotes (like 'Julia'). \n",
+    "\n",
+    "Again, here are some examples of how to access one or more rows in multiple ways using row labels instead of index. \n",
+    "NOTE: the index uses \".iloc\" and label uses \"loc\". This is easy to forget. \n",
+    "\n",
+    "\n",
+    "Again, these lines of code won't work unless you create a dataframe called 'df' but you can try them all out on foot_mouth_df to see what they do. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "KeyError",
+     "evalue": "'Julia'",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mKeyError\u001b[0m                                  Traceback (most recent call last)",
+      "Input \u001b[1;32mIn [28]\u001b[0m, in \u001b[0;36m<cell line: 1>\u001b[1;34m()\u001b[0m\n\u001b[1;32m----> 1\u001b[0m \u001b[43mfoot_mouth_df\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mloc\u001b[49m\u001b[43m[\u001b[49m\u001b[38;5;124;43m'\u001b[39;49m\u001b[38;5;124;43mJulia\u001b[39;49m\u001b[38;5;124;43m'\u001b[39;49m\u001b[43m]\u001b[49m\n",
+      "File \u001b[1;32m~\\anaconda3\\envs\\Q-Steps_Projects\\lib\\site-packages\\pandas\\core\\indexing.py:967\u001b[0m, in \u001b[0;36m_LocationIndexer.__getitem__\u001b[1;34m(self, key)\u001b[0m\n\u001b[0;32m    964\u001b[0m axis \u001b[38;5;241m=\u001b[39m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39maxis \u001b[38;5;129;01mor\u001b[39;00m \u001b[38;5;241m0\u001b[39m\n\u001b[0;32m    966\u001b[0m maybe_callable \u001b[38;5;241m=\u001b[39m com\u001b[38;5;241m.\u001b[39mapply_if_callable(key, \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mobj)\n\u001b[1;32m--> 967\u001b[0m \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43m_getitem_axis\u001b[49m\u001b[43m(\u001b[49m\u001b[43mmaybe_callable\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43maxis\u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[43maxis\u001b[49m\u001b[43m)\u001b[49m\n",
+      "File \u001b[1;32m~\\anaconda3\\envs\\Q-Steps_Projects\\lib\\site-packages\\pandas\\core\\indexing.py:1202\u001b[0m, in \u001b[0;36m_LocIndexer._getitem_axis\u001b[1;34m(self, key, axis)\u001b[0m\n\u001b[0;32m   1200\u001b[0m \u001b[38;5;66;03m# fall thru to straight lookup\u001b[39;00m\n\u001b[0;32m   1201\u001b[0m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_validate_key(key, axis)\n\u001b[1;32m-> 1202\u001b[0m \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43m_get_label\u001b[49m\u001b[43m(\u001b[49m\u001b[43mkey\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43maxis\u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[43maxis\u001b[49m\u001b[43m)\u001b[49m\n",
+      "File \u001b[1;32m~\\anaconda3\\envs\\Q-Steps_Projects\\lib\\site-packages\\pandas\\core\\indexing.py:1153\u001b[0m, in \u001b[0;36m_LocIndexer._get_label\u001b[1;34m(self, label, axis)\u001b[0m\n\u001b[0;32m   1151\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m \u001b[38;5;21m_get_label\u001b[39m(\u001b[38;5;28mself\u001b[39m, label, axis: \u001b[38;5;28mint\u001b[39m):\n\u001b[0;32m   1152\u001b[0m     \u001b[38;5;66;03m# GH#5667 this will fail if the label is not present in the axis.\u001b[39;00m\n\u001b[1;32m-> 1153\u001b[0m     \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mobj\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mxs\u001b[49m\u001b[43m(\u001b[49m\u001b[43mlabel\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[43maxis\u001b[49m\u001b[38;5;241;43m=\u001b[39;49m\u001b[43maxis\u001b[49m\u001b[43m)\u001b[49m\n",
+      "File \u001b[1;32m~\\anaconda3\\envs\\Q-Steps_Projects\\lib\\site-packages\\pandas\\core\\generic.py:3864\u001b[0m, in \u001b[0;36mNDFrame.xs\u001b[1;34m(self, key, axis, level, drop_level)\u001b[0m\n\u001b[0;32m   3862\u001b[0m             new_index \u001b[38;5;241m=\u001b[39m index[loc]\n\u001b[0;32m   3863\u001b[0m \u001b[38;5;28;01melse\u001b[39;00m:\n\u001b[1;32m-> 3864\u001b[0m     loc \u001b[38;5;241m=\u001b[39m \u001b[43mindex\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mget_loc\u001b[49m\u001b[43m(\u001b[49m\u001b[43mkey\u001b[49m\u001b[43m)\u001b[49m\n\u001b[0;32m   3866\u001b[0m     \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28misinstance\u001b[39m(loc, np\u001b[38;5;241m.\u001b[39mndarray):\n\u001b[0;32m   3867\u001b[0m         \u001b[38;5;28;01mif\u001b[39;00m loc\u001b[38;5;241m.\u001b[39mdtype \u001b[38;5;241m==\u001b[39m np\u001b[38;5;241m.\u001b[39mbool_:\n",
+      "File \u001b[1;32m~\\anaconda3\\envs\\Q-Steps_Projects\\lib\\site-packages\\pandas\\core\\indexes\\range.py:389\u001b[0m, in \u001b[0;36mRangeIndex.get_loc\u001b[1;34m(self, key, method, tolerance)\u001b[0m\n\u001b[0;32m    387\u001b[0m             \u001b[38;5;28;01mraise\u001b[39;00m \u001b[38;5;167;01mKeyError\u001b[39;00m(key) \u001b[38;5;28;01mfrom\u001b[39;00m \u001b[38;5;21;01merr\u001b[39;00m\n\u001b[0;32m    388\u001b[0m     \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_check_indexing_error(key)\n\u001b[1;32m--> 389\u001b[0m     \u001b[38;5;28;01mraise\u001b[39;00m \u001b[38;5;167;01mKeyError\u001b[39;00m(key)\n\u001b[0;32m    390\u001b[0m \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[38;5;28msuper\u001b[39m()\u001b[38;5;241m.\u001b[39mget_loc(key, method\u001b[38;5;241m=\u001b[39mmethod, tolerance\u001b[38;5;241m=\u001b[39mtolerance)\n",
+      "\u001b[1;31mKeyError\u001b[0m: 'Julia'"
+     ]
+    }
+   ],
+   "source": [
+    "foot_mouth_df.loc[0]         # try changing the 0 here to something else to see how it works. \n",
+    "                             # What happens if you reference a row that does does not exist? \n",
+    "                             # Try accessing a row called \"julia\" or row 100?        "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.loc[2]          # Select Row by Index Label\n",
+    "df.loc['Julia']          # Select Row by Index Label as a string\n",
+    "df.loc[[2,3,6]]    # Select Rows by Index Label List\n",
+    "df.loc[[2,3,'Julia']]    # Select Rows by Index Label List that mixes numbers and strings\n",
+    "df.loc[1:5]     # Select Rows by Label Index Range\n",
+    "df.loc[1:'Julia']     # Select Rows by Label Index Range that uses numbers and strings\n",
+    "df.loc[1:5:2]   # Select Alternate Rows with in Index Labels"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**To sum up the differences:**\n",
+    "\n",
+    "* `.loc` works with numbers and strings whereas `.iloc` only works with numbers\n",
+    "* `.loc` will give errors if you search for a label that isn't there but `.iloc` will just access everything up until the end \n",
+    "> e.g. if you try `df.iloc[:100]` but only have 50 rows, it will just give you all 50 rows\n",
+    "* When using `.loc` you can select Index ranges and Lists via combinations of numbers and strings!\n",
+    "* With `.loc` you need to specify the labels of rows further down but with `.iloc` you can just use minus indexing - great for if you dont know how many rows your DataFrame has!\n",
+    "\n",
+    "Aside from this the syntax is the exact same!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Accessing columns by index and label\n",
+    "\n",
+    "How about accessing columns in a dataframe?\n",
+    "\n",
+    "It works a lot like accessing rows, with .iloc (the index position) and .loc (the label). \n",
+    "\n",
+    "BUT! Now you need a comma inside the square brackets. \n",
+    "* BEFORE the comma (or everything if there is no comma) determines what rows to return, and\n",
+    "* AFTER the comma determines the columns to return.\n",
+    "\n",
+    "\n",
+    "\n",
+    "ALSO! For some reason, you cannot use non-string labels when accessing columns. No idea. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "foot_mouth_df.iloc[:,[1]]   \n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Select columns by Integer Index\n",
+    "df.iloc[:,0]       # access single column\n",
+    "df.iloc[:,[2,3]]   # NOTE: the extra set of square brackets needed when accessing multiple columns\n",
+    "\n",
+    "df.loc[:,'Julia']              # You really want to use strings when accessing columns with .loc\n",
+    "df.loc[:,['Julia', 'Leila']]   # NOTE: the extra set of square brackets around the multiple strings\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Accessing individual cells by using both rows and columns\n",
+    "\n",
+    "Use only .iloc or .loc (not a mix of both). \n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "\"Information about diarist\\nDate of birth: 1937\\nGender: M\\nOccupation: Group 5\\nGeographic region: North Cumbria\\n\\nWeek 1\\nMonday 11th March 2002\\nWhilst watching the local TV news at 6 p.m. there was a news item that caused us to reflect back on the events a year ago. A young lady had just left a court where she had been found guilty of assaulting a Police Officer and also being in change of an offensive weapon -–a knife. The judge had acquitted her of the offences, he showed leniency towards her. Last year during the FMD crisis she had returned to her home to find that her pet goat had been killed by slaughterers because the animal was within the 3 km radius. She had gone berserk over this and threatened the Police Officer and others with the knife. She had to be forcibly restrained, she was very distraught over this killing.\\nEven after she had appeared in court and had been acquitted of all charges she showed great emotion not only being freed but also quite upset over the loss of the goat. Perhaps her actions didn’t happen to a lot of other people who had similar things happen to them. However, the loss of a lot of pet animals and in some cases, needless slaughter of many farm animals still creates unhappy memories of 2001.\\n\\n\\nWeek 2\\nTuesday\\nWhilst walking the dog I met a farmer from the edge of the village who has friends and stock in close proximity to the 2 land fill sites.\\nHe is still very concerned about materials on these sites. The nearest site contained hundreds of carcasses. This has been completed and capped. He is concerned about leachate from this site and feels that it doesn’t matter how much clay and soil were used to contain this site, the effects of heavy rain is bound to find a way down and also to drain it. He doesn’t want to plough these fields, nor can he sell stock that have grazed the same fields.\\nThere is pyre ash being tipped on the other site. Again, what happens to the rainwater that runs off this site? Also there are concerns about the large flocks of seagulls that visit both sites daily.\\nAnother concern is what is happening to the open-cast coal site that is situated almost due south of Gilgarran Village. The farmer I talked to today is concerned about this huge site. No coal has been moved from this site for months. There are concerns that this site is going to be filled with waste. Will it be from FMD sites? We, as a village, are very concerned about rumours of land fill on a huge scale. \\nFriday\\nNoticed that there was work being carried out on the top of the burial site. No villagers have commented on this, despite large yellow diggers operating.\\nSunday\\nWork continuing on the burial site. Cannot make out what kind of work is being done there\\n\\n\\nWeek 3\\nMonday\\nWork is still going on at the burial site. I still don’t know what is going on, but the diggers involved are the same as when animals were being buried there. When animals were being buried there last year, the smell coming from that site was terrible to say the least! It was not coming from the dead animals as most observers thought, but from decomposing waste material that had already been buried on the site prior to FMD.\\nWhen excavators dug into the soil to make trenches for the dead animals, they dug into this decomposing matter, hence the terrible smell. Despite the work that is going on there today, no comments from villagers are forthcoming. It seems to me that now that FMD has gone, the general public are not interested any more, unless they read something in the local papers written by some enterprising reporter!\\n\\n\\nWeek 4\\nTuesday\\nWork is still going on in the former burial site. Villagers don’t seem to be bothered. FMD is gone, so nobody is interested any more.\\nWednesday\\nWhilst trying to gain comments from villagers over the effects of FMD, one or two comments from some individuals show concern about the outbreak last year, but don’t seem too concerned over any after effects, if any!\\nTwo interesting comments suggest that (1) the outbreak was started deliberately by ‘this country’ in collusion with the agriculturists of the E.E.C so as to concentrate meat production in Europe and leave the UK to concentrate on arable farming; (2) The outbreak was started by a terrorist attack. The Government would not declare this because it would cause widespread panic.\\nThursday 23:25 hours\\nHuge fire at the site where pyre ash is being tipped. 250,000 used tyres caught fire. Arson is suspected. Fire fighters tried to contain the blaze, but couldn’t use large amounts of water in case water courses became contaminated.\\nFriday 05:00\\nFire still blazing at the pyre ash site. Later in the morning the fire was showing signs of dying down, apparently it was left to burn itself out. Much heavy smoke pollution was evident, drifting south west for about nine miles.\\nReading the local evening paper about the blaze, there was also a report that villagers from Disington (1¾ miles from Gilgarran) were complaining of the foul smell from both waste sites. Parish councillors are very concerned about this. Does it coincide with work currently being carried out on the burial site?\\nThe smell from these sites plus the fact that animals were buried on one site and pyre ash plus the huge fire from the other site all happening this week is causing concern in this area. But once this ‘hue and cry’ dies down, people will soon forget about it all.\\n\\n\\nWeek 5\\nMonday through to Friday, observed work on top of the burial site. Don’t know if any work is still going on on the northern and western sides. \\nFriday\\nLocal weekly paper carried the report on the recent large fire that occurred on the Alco site last week when 250,000 tyres caught fire somehow. It was intersting to read that the fire brigade did not use any water to extinguish the blaze in case pollution occurred in water courses. The fire was left to burn itself out.\\nSaturday\\nBurial site – it looks like there is new soil being tipped on top for some reason. No reported comments froim the Parish Council over this, despite very vociferous objections by them over the use of this and the Alco site in the past. \\nSunday\\nTalked to our local County Councillor (who lives in this village). He feels very strongly that these two sites are dangerous. He thinks that both sites are a health hazard risk due to obnoxious odours and in particular, the large fire that occurred last week which produced a lot of polluted smoke for a distance of six miles. Some people reckoned that the smell of burning tyres could be smelt here in Gilgarran. There have been numerous fires on these sites over the last few years. These fires give rise to compaliant by people like us, but more so from the nearer village of Distington (1¾ miles west of here). The councillor suggests that there could be more incidents of cancer cases in this area in coming years along with respiratory troubles as well as some cases of bronchitis related problems. He himself has recently suddenly started sinusitis, which he hasn’t had before. All in all, he wasn’t happy about the situation on both sites. We don’t know what is being tipped there, all we can do as a community is accept what we are being told by the site owners. As previously stated, animal carcasses were being tipped and buried for about three days before we were told officially that this was so.\\nIncidentally, the site where animals are buried is owned by Cumbria County Council. This seems to be totally against the advice of County Council officials who look after the environment and the health of the population. As I’ve written before, there are going to be bigger concerns if the opencast coal site to the south of the village becomes a landfill site for refuse from parts of the county fifty miles away. At the moment there are no suggestions that anything from the FMD outbreak will be dumped there. Having said that, however, we as villagers didn’t know of carcasses being buried or pyre ash being tipped until after it had happened. We await the outcome of this coal site with some trepidation, after all, no coal has come from this site for some months. It has all the indication of becoming a land fill site.\\n\\n\\nWeek 6\\nMonday to Wednesday, if work is still ongoing at the burial site it is not visible from our side of the site. I still don’t know what is going on there. It may all be innocent and an improvement to the environment, after all, this is what the site owners have to do.\\nThursday\\nA delegation of MEPs visit the north of the county. They have come to assess the situation for themselves and to report back to the European Parliament. No doubt they will also report back to their own constituents in their own countries. The delegation visit the auction mart at Longtown where the disease was first noticed in this country and also visited the big burial site at Great Orton where it was estimated that half a million carcasses were buried. Good coverage by the local press, radio and T.V. gave anyone interested the views of the delegation.\\nThursday – Saturday\\nThe MEP delegation agreed that the FMD situation had been disastrous (we all know that!). Comments from some tourist and agriculture observers ranged from a ‘waste of time’ to ‘at least some politicians have bothered to visit us, our own couldn’t do that’ Personally, I think that some good came out of this, particularly when it was reported that the Dutch had used vaccination techniques when they had a small outbreak.\\nMany people think that the British Government should have had a public inquiry into the outbreak. What have they to hide? Cumbria is holding its own inquiry – quite rightly so, other organisations such as Lancaster University are holding research into the outbreak. Why not the Government? Eventually we will know why, perhaps not in my lifetime though. The minister and MAFF have a lot to answer for.\\n\\n\\nWeek 7\\nThought it would be of interest to include copies of the newsletter that the local authorities issued to every household in the area regarding the disposal of carcasses and effluent. It will be of note that there was a fire last year on the Alco site, also involving tyres. Very similar to last years only not as big. A report on local T.V. today stated that the recent visit of MEPs to the area considered that vaccination should have been used at the outset and be should seriously considered should a future outbreak occur. Heard of reports of an outbreak of T.B. in cattle in other parts of the country. This was reported to be more serious than FMD should a major outbreak occur. This would lead to the question of disposal should the need arise. As I’ve already reported in previous entries, the use of the opencast coal site to the south-east of here is causing concern in some quarters. Although the site didn’t feature in the FMD crisis, there is a feeling that it is being earmarked for use in the future should the need arise or even the rumour of an incinerator is planned for there. The general feeling here and in the surrounding area is that we have had enough dumping of carcasses, effluent, toxic chemicals etc. It could be that the authorities have seen that the sites concerned have handled those substances before, that an extension of disposal sites in this area would be effective.\\n\\n\\nWeek 8\\nNothing of any significance to report this week.\\n\\n\\nWeek 9\\nNow that Cumbria’s FMD inquiry has started, a lot of people I have met this week recall the happenings of a year ago. Even more interesting is the coverage in the local press and T.V. Plenty of publicity by the media shows how little the Government an MAFF in particular let the farming and tourism industries of the county down. There has been plenty of distressing stories by farmers not only of infected animals being slaughtered but also the slaughtering of healthy animals in the 3 km circle of an outbreak. One particularly distressing point of evidence was when a farmer described to the panel the birth of a calf five days after it’s mother had been shot! We at the time of the outbreak were hearing these stories on a daily basis and still MAFF and Mr. Brown kept telling us that the outbreak was ‘under control’. All I can say at this point is may heaven help us when it all happens again.\\n\\n\\nWeek 10\\nWork is still going on at the burial site. It looks like new soil is being dumped on top of the actual site and ‘dozed’ to level it of and to smooth it out on the side. All we can do is accept that the management of the site are making it better for all concerned and that they are as concerned as we are. The much publicised Cumbrian FMD inquiry team visited the land fill site. They met local councillors who expressed their concern over this site and the Alco site. No other report was forthcoming from the team. The inquiry team finish their evidence gathering this week. One very important statement was made that the Minister of the Environment should make a statement over this outbreak and should even make a visit to these sites county-wide. There has been total silence from Mrs Beckett’s department over this request. The same silence is observed from any government source for that matter. Everyone asks the same questions, what have they got to hide? Why aren’t they interested? What plans are being made? And what lessons have been learned from last years outbreak? A lot of farms are restocking and in this neighbourhood, farm work is going on as before, or so it looks. As time goes on though, there seems to be a smouldering anger that no-one in authority is as concerned as well are.\\n\\n\\nWeek 11\\nWork is still on going at the burial site. No comments heard from any of the villagers or neighbours this week.\\n\\n\\nDiary 12\\nMonday, from my own observation work is still ongoing at the burial site. More heavy plant has been moved on to the top of the giant amount and it looks as though more topsoil is being laid over the Mount. Perhaps to improve the site, but water may still permeate into and through the site. We can only believe the operators that this is a right thing to do.\\nFriday, talked to 2 it villagers about the after-effects of FMD. One said oh it's all over now and forgotten about it doesn't bother me one bit. The other said it all in the past we just have to forget about it. It seems that life is returning to normal in all aspects of village life, people don't think about last year unless the diarist mentions that. \\n\\nSunday, a bad day or weather wise. This prolonged rain may halt work on the burial site. Most people are reluctant to talk about F M D now, even if it was one of the worst economic and social disasters to hit this country and this County in particular. Now that it is over, people's memories begin to fade. However, some of us are not happy at having these two disposal sites within a 1000 metres of this village. FMD may be over but these burial sites are here for a long time yet.\\n\\n\\nDiary 13\\nObserved in work on burial site. More heavy machinery and plant moved in and large quantities of soil are being laid down and smoothed out.\\n\\n\\nDiary 14\\nTalked to some religious today about the after-effects of FMD. Without exception, they are not interested! It's all over with an idle one to be reminded about it are the general comments. Nobody seems bothered that there are hundreds of animals buried a 1000 yards from his village or the fact that there is leachate and pyre ash buried in another site. Looking at the burial site and the work that is going on there, it does look as though the management there are doing everything to make the site safe.\\n\\n\\nDiary 15\\nI met a smallholder today to whom I have talked to in the past about the effects and after-effects of FMD. He still not happy about the burial site despite the landscaping and smoothing off of the large quantities of topsoil, only time will tell he says. He does not have any stock near to the site but he has sheep on the farmer's land. Since FMD finished though his stock movements are still restricted by new legislation that has come in since the area was declared free. For instance, or if he takes a sheep to auction, he asked to have nine pieces of paper for this transaction. If the price is not right and he has to take the she back to his land he was put them back in the same field that they came from and it cannot move them to three weeks. He then has to obtain a licence to do this. He does think that the authorities are not going to be as strict shortly. This is just one of the precautions that have come in to try and combat any recurrence of FMD.\\n\\n\\nDiary 16\\nI met the smallholder who rents land a from the farmer in the village. His income from the sheep that he a breeds has been nil, like many more people in similar circumstances. Fortunately for him had he has an income from another source. The subject of compensation came up during our conversation. I personally do not have any comment to make about this item as it maybe just a rumour, apparently he got it bee in his bonnet about compensation paid out to people who were not in the agricultural business. What seemed to upset him was that he had heard that some of fish and chip shop owner in the Lake District had been paid £170 per month compensation for the loss of trade. He didn't mind too much that hoteliers and guest house owners had claimed compensation, but wondered where else would this kind of money go when he himself had been paid nothing. This is the first time I've heard this one!\\n\\n\\nDiary 17\\nAttended the Cumberland Show at every to be park Carlisle. We, as a family used to attend this annual show regularly, both as spectators and competitors. We have never seen the show like the one put on this year, when will things really get back to normal? Many of us think that agriculture is back to pre-FMD. Cattle and sheep on grazing in the fields, lambing has reached new heights in produce on some farms. Calves are being born, silage and haymaking is progressing when the weather permits. But there are still restrictions on animal movements. Hence, no sheep cattle or pigs at this year's show only horses, poultry, dogs and rabbits. Not many pieces of agricultural machinery onshore either. Plenty of Chartered Accountants tents, craft tents, Horse feeds and tack, displays in the main arena and bands. Not an agricultural show as we knew it. It seems to be the same at other shows, Ennerdale show is one of our local shows. This year there isn't going to be any horses or sheep. Generally there are no cattle shown at the show, but without sheep (hill farmers dominate the show) the there isn't going to be much on show at all. It was always a good show for equestrian events at many levels. This show was always a must for our family. I don't think that we will be going this year.\\n\\n\\nDiary 18\\nFrom the golf course and golf driving range I can look out on to the western side of the burial site. I have written in previous weeks about the work there has been going on at this site. Viewing the site are from our village side, would hardly know what that there ever was a burial site. Hundreds of tons of topsoil had been laid and smoothed out to make more-or-less like a landscaped feature. It looks really good. From the western side though, things are little different. Work is still going on there, large amounts of soil have been tipped and levelled off. There are still Portakabins there and heavy plant can still be seen moving about. No doubt the western side well look as good as the eastern side before long.\\n\\n\\nDiary 19\\nIt is announced that the Prime Minister and his wife and son of his family at a visit to Cumbria. The PM arrives in West Cumbria, all kinds of reports are written in the local and national press about what he is going to do or not do or what he should be doing. After all, he is on holiday. The PM did meet some farmers' leaders, the press as usual stirred things up or as to where he should be meeting. Tourism officials say that the trip was fantastic for tourism in the county. Or person they I can't see what difference it made. If people want to come Cumbria, they will come irrespective of whether the PM comes or not.\\n\\n\\nDiary 20\\nAfter a lot of protests it looks as though it the 20 day restriction on cattle Movement will be lifted. Perhaps this will now mean that they could be cattle and sheep entries at local agricultural shows. Some shows are going ahead with very limited entries of livestock and some with no animal entries at all. These shows have always been very popular with my family for over 20 years. Also, living with in a farming community makes us feel part of the annual agricultural scene.\\n\\n\\nDiary 21\\nI’ve written before regarding agricultural shows and the pride in which local people take in these shows. Although a lot of shows have gone ahead this season, they have had a reduced animal showing or in some cases no animals at all. Today I’ve heard that one show has been cancelled altogether. This particular show is one of the most popular in the area. Maybe because of lack of entries or the organisers just wanted to cancel because of the 3 week restriction on animal movement. I don’t know. Perhaps it would be better to cancel them than have a depleted show.\\n\\n\\nDiary 22\\nSpent a few hours in the fells today. It was good to be able to wander the familiar paths and let our dog run free. It was a good boost to our moral and perhaps the dog’s too! We all missed being able to do this last year.\\n\\n\\nDiary 23\\nLast Bank Holiday before Xmas and the last before the schools go back. At the golf course where I help out part-time during the summer we had lots of customers. A lot of them commented on how enjoyable it was to be on holiday in this area this year, compared to the restrictions that were in place last year. Maybe the holiday establishments are getting back to normal. There are no restrictions put on them like there is in place now with farmers and agriculture.\\n\\n\\nDiary 26\\nSorting through the mail left whilst away on holiday and I came across a notice sent by the village committee notifying a Harvest Thanksgiving festival to be held next month in the village hall. As we have no church in the village, it is being held in some farm buildings in the centre of the village. This will be a splendid event. The farm did not have FMD but couldn’t take animals from one field to another and couldn’t market them. When we consider the gloom that settled on this farm and community, it is very welcome to have this unique event here in the heart of the village and the farmer and his wife will be at the centre of events. A lovely gesture and I hope it will be well supported. There will be a distribution of harvest gifts afterwards, what a change from a year ago!\\n\\n\\nDiary 27\\nWith the aid of binoculars I have been able to have a closer look at the burial site from a westerly direction. There are vents in the shape of small towers to extract gas from the site. There are pipes connecting these vents. A lot of work is still going on there. However, all this takes place in the Western side which is the opposite side to where my village is situated. From our side there is nothing to suggest the amount of work going on. Because of this, FMD is pushed further into the backs of villager’s minds. It is something in the past. It has happened, so what? People like myself who talk to farmers and agriculturalists do not easily forget these events. Personally I am still concerned about the burial site. When inquiries are made about it, all we can do is accept what we are told. It does not look as though every precaution is being taken to alleviate an odours or contamination. \\n\\n\\nDiary 28\\nI had to see the village farmer on another matter and was asked inside for coffee and a chat. He was able to tell me of the full implications of the ’20 day rule’. He accepts that this is a precaution to prevent another outbreak of FMD, but there is a lot of work involved. He told me of an isolation area that he has created and also the fencing arrangements where his land adjoins the neighbours land. I would say that 95% of the public don’t know about this even if they have heard of the 20 day rule. For him (he owns the largest farm in the area) it is bad enough having to do all the physical work as regards fencing, etc. But for anyone such as a small holder, it must be a nightmare if he has to bring animals back from market that haven’t been sold. \\nFriday, my wife and I played a round of golf at Aspatria. This course was badly restricted when FMD hit this area. We were reminded that there are restrictions on adjoining land. There were notices asking people who hit balls onto farm land not to cross the fence to retrieve them because of FMD precautions. This was news to us. It does make sense though. The farmer wouldn’t know where players had been walking prior to playing golf. \\n\\n\\nDiary 29\\nAttended the Harvest Festival held in  the village farm, a large cattle shed had been cleaned and decorated for this event, chairs had been brought in, fruit and vegetables were on display for auctioning at the end. The place was packed! A lot of money was raised and it was a very happy event, well supported and a big boost for the farm and the village.\\nI don’t think that the general public care much about FMD now that is has been a year since the last case was confirmed in Cumbria. The public may be reminded if they read the local newspapers intently, for instance, there was a letter to the editor published recently which referred to the results of the Cumbria Inquiry into FMD. It may have been a farmer who wrote it, I don’t know, but the writer certainly went to town in the scathing comments on the handling of FMD. Even caustic remarks regarding the efforts since FMD of DEFRA and Mrs Beckett. I certainly wouldn’t like to cross the writer, I also think the farming community must be holding it’s breath in case the present restrictions such as they are, prove to be worthless. Then we will all suffer, again!\\n\\n\\nWeek 30\\nWhat a difference a year makes! Despite some restrictions on public access to agricultural fields in some areas of the county, it doesn’t apply here. Although most locals confine themselves to footpaths and bridleways, other people seem to think that all fields are recreation areas. They walk and run across some of the fields in close proximity to the village. Regardless of the presence of stock they exercise dogs and treat it as a some kind of park. One farmer is well know for being aggressive, he used last year’s FMD outbreak to run people off his land.\\nI met a local councillor who expressed concerns regarding the proposed building of an incinerator to the south of the village on the current open cast mining site. The two waste disposal sites to the west and north-west of the village have become big issues in the last 18 months due to the burial of animals and the disposal of pyre ash and leachates. It seems as though we are going to get over this ghastly FMD outbreak only to have this scenario thrust upon us.\\n\\n\\nWeek 31\\nMet a small-holder who keeps sheep near to this village. He was very scathing over the report that the Government and DEFRA don’t want to talk up an offer from the Local Authorities here to implement findings and recommendations from their local inquiry over FMD. Why? What has this Government, who didn’t perform very well during the outbreak, got to hide and why shirk away from the findings instead of facing up to the failings that we all know about. It also seems that they don’t want to make any safeguards and recommendations to avoid a further outbreak. As a non-agriculturalist, it doesn’t surprise me in the least. After all, Government has failed other industries in the country for as long as I can remember.\\n\\n\\nWeek 32\\nI am convinced that authorities in the area must think that the way animals were buried here and pyre ash and leachate were disposed of at another site nearby was all done as very successfully and that the two sites handled everything professionally. Therefore the sites would be more than capable of handling ash from an incinerator. To me, this is the legacy of FMD. I am most annoyed over this, together with a lot more of the villagers. This village no longer has a representative on the parish council, both have resigned for whatever reason and no-one will step forward to take it one. I have said that I would take a set on the parish council to represent the village and fight for our rights and future quality of life. Due to this, I have uncovered a pile of claims and counter-claims. It seems that both parish and district counsellors know what is going on (regarding the incinerator) and that developers have made ‘concessions’ to some councillors. Also there are claims that the developers have offered money to local landowners and farmers so that roads can be put in. All these accusations have been strongly denied. At the same time it is rumoured that some farmers have been offered local fields nearby. Because of what I have discovered in my own investigations, it would seem that a lot of friendships gained over 20 years could come to an end, I am fearful of what I have uncovered. There are also claims that ‘councillors are only in it for what there can get out and are not to be trusted.’ I don’t want that said of me. Also by the time all this is sorted out, I will be 70-75,  I certainly don’t want to be fighting peoples battles at that age. However, I will support any effort to stop the proposed development. \\n\\n\\nWeek 33\\nOnce again the large farm in the centre of the village was the venue for the annual Guy Fawkes bonfire and fireworks. Organisers had been round the village asking for donations to provide fireworks. A tractor and trailer toured the areas picking up things for the bonfire. Drinks and food were served in a barn after the fireworks. This is another occasion when villagers and the farming community come together. It is perhaps the only time that the general public of the village think about FMD and last years events, if only briefly. The farmer remarked that is the third time this year that there has been a public function on his farm. The first was the jubilee party in June, then on October 6th the Harvest Festival service. These events keep farming in the public eye.\\n\\n\\nWeek 34\\nI haven’t written before about the proposed building of an incinerator nearby to burn the counties waste. If , as we all suspect, the incinerator is built, then the odours plus the disposal of ash (to the FMD waste site) is a legacy of FMD, particularly regarding the nearby burial and disposal site.\\n\\n\\nWeek 35\\nThis is week 35 of this project and for most of the 35 weeks I have written that I am not confident of the future. There are numerous reasons for this. Mainly the situation in the Middle East. Today I travelled to Keswick to do some Xmas shopping. I was given a lift there by a neighbour who is in his 30s. He was very upset about the terrorist situation, not only was he concerned about the terror threat to the London Underground, but the threat closer to home as regards a plane crashing into the nearby Sellafield complex. We don’t know the effect that this constant bad news has on people. People who have already got serious worries, e.g., families, housing, finance, etc must feel really depressed about it all.\\n\\n\\nWeek 36\\nNear to the next village is a long established farm of many acres. Recently the farm’s stock of animals and machinery was sold off. The owner, who had farmed for sixty years was leaving to live with one of his brothers. He said that he wouldn’t know how he would feel when he left the farm for the last time this weekend. The farmhouse hasn’t been sold yet and now stands empty. It’s a strange place now, where everything was hustle and bustle (they even had a B & B business there) is now derelict and bare. It’s a sad reflection on the agricultural business in the wake of FMD. This farm isn’t the only one in the area that has sold up. Some farm houses remain as dwellings, but this particular one which we saw nearly every day is just an other sad reminder of the way farming has declined in this rural area.\\n\\n\\nWeek 39\\nTuesday.  Boarded the train  at Penrith to journey to Crewe to see our daughter.  During the journey I got into conversation with a fellow passenger.  He noticed I had got on the train at Penrith and perhaps thought I was connected with the agricultural industry.  The conversation drifted into the previous years FMD outbreak.  It is rather strange, that I live in a very rural area, and , FMD is rarely mentioned now.  However, this fellow passenger (although not from an agricultural background) gave his views on the handling of the situation.  It was no different from the views expressed by locals at the time of the crisis.  It just goes to show that FMD is very much in peoples minds even if they were not connected to agriculture in any way.\\n\\n\\nWeek 40\\nFriday.  Now that the MEP have published their critical report on the FMD crisis, it is interesting to read an article published in our local weekly paper, from a reader … (Article entitled ‘Foot and Mouth Report’ included). \\nI don’t have the knowledge or the data to support this readers comments.  However, I have heard plenty of stories from mainly unreliable sources, to confirm what he says.  It makes interesting reading I think.\\n\\n\\nWeek 41\\nTuesday.  No wonder my confidence in the future has taken a big plunge over the last few months.  The situation in Iraq doesn’t get any better.  Mr Tony Blair’s message to the Armed Forces of the UK bear this out.  Being an ex-serviceman, I know what the situation holds for our troops.  But, are we right to follow the USA in a war against Iraq?  No doubt Saddam Hussein does pose a threat but so does India and Pakistan to each other.  Each of these two relatively poor countries has threatened each other as regards their nuclear arsenals.  Now, the loose cannon in the form of North Korea is positioning itself as regards its position in the nuclear arms league.  Personally, I think that North Korea poses a more dangerous threat than Iraq.  It is not a very happy New Year for a lot of people.  Perhaps it will all be settled diplomatically.  I wonder.\\n\\n\\nWeek 42\\nNothing of any importance to write about due to refurbishment at home.\\n\\n\\nWeek 43\\nMonday.  One of the items on the agenda for this months meeting of Distington Parish Council is a report on the wood-felling and the implications of this.  As I have written in the diary before, there are strong rumours of the proposed plan to fell woods, build a new road through the felled site and bring coal from the nearby opencast site to link up with an existing road, then, to transport the coal to a storage area on Workington Dock.  Then, when the coal is worked out, to build an incinerator on the coal site.  Ash from this development would then be transported on the ‘new’ road to be disposed of on the waste disposal site that was used for FMD pyre ash and leachate.\\nThursday.  Read a report of the aforesaid meeting.  The owners have declared that our worries are groundless.  In fact, they say that they plan to eventually open the woodland to the public (the owners of the woodland are the same operators of the opencast coal site).  Footpaths will be created if a grant can be obtained.  A wooden wheeled ancient water mill will be restored.  After the closed meeting the operations director of the site said that ‘There has been a misunderstanding.  What we are doing will benefit local people’.  He said that a management project for the wood is being followed involving felling dead trees and fresh planting.  He added: “The felling and replanting will be done this year after which it will take time to become established.  We’re talking of a ten year programme but it should have long-term benefits.  I think our PR at the start of this wasn’t very good and in the future we will let the council know of our plans”.  The council agreed to keep a watch on the work here in G.\\nThis statement differs greatly from what some of us have been told by our village-based County Councillor.  There has never been any suggestion that the felled woods would become a land fill site, but would be felled to provide the new road.  There was nothing mentioned at the meeting regarding the proposed incinerator being built.  The County Council … that this has ever been planned.  However, our representative is adamant that this is not so.\\n\\n\\nWeek 44\\nTuesday.  For the first time, my property has finally overcome a situation that was affected by FMD.  \\nIn July 2000, the electricity supplier notified me to say that the trees in my garden had grown so tall that the topmost branches were in close contact with an eleven thousand volt overhead power line and that they should be felled or severely pruned.  After some further negotiations it was decided to prune to some height that I wasn’t happy with.  Although the treetops were not actually touching the wires, it was considered a risk in the forthcoming months.  However, as time passed I couldn’t wait for the foresters to arrive, so I pruned the trees myself.\\nIn January 2001, the electric supplier suggested that the trees should be pruned further.  A date was agreed but the foresters didn’t arrive.  Time dragged on and the trees grew back to their original height.  Again, the electric supplier suggested they be pruned or felled.  A new date was agreed upon.  However, the foresters couldn’t do the job because the isolator switch was on farmland and they couldn’t get access to it because of FMD restrictions.  And so it dragged on!  Despite visits by foresters and electric supplier reps. the trees got bigger and I was forbidden to touch them.  Neighbours could hear crackling noises coming from the wires and it became very worrying.  People suggested that I should ‘do something about it’.  I took the matter up directly with the supplier and the foresters.  I was promised dates only for them to be cancelled.  In December 2002, a date of 21st January 2003 was given.  This time, they came and we agreed that two trees be felled and another pruned.  After 30 months it finally happened. \\nThursday.  Met a small holder who has his land on the edge of this village, who told me that the 20 day rule of animal restriction of animal movement was being lifted and replaced by a 6 day restriction.  This was good news for him and any other farmer.  Later that day I met another farmer who didn’t know that the restriction was being lifted.  You would have thought that I had told him he’d won the lottery!  Good news all round for the people.\\nFriday.  Listening to the local radio today and was surprised to hear a report that the Citizens Advice Bureau in a small Lakeland town had been receiving clients who were still experiencing hardship due to FMD.  It is now 18 months since the last outbreak and the effects (according to the person being interviewed) were still being felt.  Not just by farmers and agriculturists, but by guest houses, hotels, tradesmen and in particular, some self employed.  Debt seems to be the biggest problem.  It seems as though some people had weathered the hardships of FMD initially only to find that their plans had come adrift somehow afterwards.  Quite disturbing to hear that the situation is still with us in this county to some degree. \\n\\n\\nWeek 45\\nThese diaries were instituted to deal with the after effects of FMD.  Although there were no cases of FMD in this village, everyone knew about it, particularly as nearly everyone who went to work from here would pass the main farm in the village centre, or, some of the farms on the outskirts of the village.\\nNow that FMD is over, most people who live here don’t seem to think about it anymore.  The only people affected are the farmers, naturally.\\nThis is a strange village in lots of ways.  Only the farmer and his immediate family are connected with agriculture.  The rest are professional people or people who work at nearby Sellafield, industries in Workington and Whitehaven, or are retired.  There is no church, no village pub, no village shop, no village community centre or meeting place.  Only tradesmen that call are the milkman and the solid fuel merchant.  We are left to ‘get on with life’ in our own way.  The parish of Distington to which we belong have all the facilities associated with a larger community, such as a church, pub and community centre.  All of which are two miles away.  Consequently, the Parish Council meets there once a month and discusses all the problems of the area including ours.  However, our representative on the council has resigned and no-one has come forward to represent us.  Anything that has been discussed at the Parish Council is reported in he local newspaper.  \\nVillage pubs are a good venue to discuss local issues and to exchange views and, mainly, to gossip.  Village ‘tittle tattle’ as I call it!  As we have no pub, the gossip is rife from one source or another with bits added on or left out as is the choice of the person concerned.  Quite a lot of people one meets are ‘experts’ in their own particular choice of subject whether it is politics, finance or Mrs Jones current boy friend.  It is a fault to take on board all that is gossiped about when one meets a fellow villager in the country lanes whilst out walking the dog.\\n\\n  \\nWeek 46\\nIllness to a family member.\\n\\n\\nWeek 47\\nContinued illness.\\n\\n\\nWeek 48\\nOver the past few weeks there has been a lot of tree felling in the nearby woods.  This has led to a lot of disturbance to the villagers because of the use of large vehicles needed to remove the felled timber and also the foresters vehicles churning up the grass verges and the ditches.\\nA lot of concern was raised about the necessity of all the tree felling.  These concerns were raised in the press and also in the parish council.  (I have written about these in diaries in the last few weeks).\\nIt was reported in mid-January that all the felled woods would be replanted this year, with footpaths created for the enjoyment of the local population.  Now, all timber operations have ceased.  Large areas of woodland have been left partly felled and a lot of felled timber is left lying about.  Foresters vehicles have gone and nothing is happening.  Despite assurances from the developers, it looks as though something drastic has happened.  Village ‘tittle tattle’ says that the foresters have not been paid for their work so far and that the developers have run out of money.  If this is so, what is going to happen now?\\nWhen felling started late last year, I contacted two environmental agencies regarding the threat to the red squirrels, badgers and buzzards that occupy these woods.  I was told that it was only a partial felling and they (the environmental agencies) were satisfied that any disturbances would be slight.  I think that they were told this by the developers, and accepted what they were told without a site visit.  The developers have been known to mislead groups in the past, including landowners, farmers, councils and individuals.\\nI, personally am not happy about this situation.  I have always took a keen interest in wildlife and feel that we have been let down by the lies of developers and the lack of serious interest from wildlife agencies, some of which are an offshoot of central Government.  I for one will keep a close look on the situation with or without other villagers and in particular, local councillors.\\n\\n\\nWeek 49\\nBy chance I met three small holders all at the same time.  They were discussing farming by the roadside.  All of them were pleased that the 20-day ruling was coming to an end and that their lives were more or less coming back to normal.  They also expressed the opinion that the 20-day rule and the 6-day rule were only in force to protect their interests.  However, they were unanimous in their condemnation over the importing of foreign meat and meat products into this country.  They feel that foreign meat is not subjected to enough checks before entry into the United Kingdom.\\n\\n\\nWeek 51\\nMet a farmer today who told me that he’d seen a report based on findings by the EU and DEFRA. It stated all the things that everyone who is an agriculturalist and those who take an interest in the countryside had been saying about what was wrong with the handlers of the FMD outbreak. It just proves that it doesn’t take an academic genius to know what should have been done at the time. Everyone can be wiser after the event, but statements by the NFU and individuals at the onset were not heeded. For example, the movement of animals should have been halted sooner and the Army should have been brought in much sooner. Now, the question of vaccination rumbles on. Should we or shouldn’t we vaccinate? There is a fear of the outbreak again, particularly when the findings of the 1960 outbreak were not implemented. \\nSince the sadness of FMD, there has been quite a few instances of socialising at the farm, such as harvest festival, jubilee party and almost any excuse for a ‘shindig’, good to see farmers enjoying themselves.\\n\\nWeek 52\\nMet out local farmer who told me that there is to be new legislation to dispose of fallen stock. No longer can a farmer bury fallen stock on his land, but must now provide an incinerator to dispose of dead animals. This must be a costly business, could dead animals not be taken to a central point and burned?\\n\\n\\nWeek 54\\nOne thing about FMD was the effect that it had on the poaching fraternity. Living in a rural area, we expect this to happen. Nobody seems to mind that a few rabbits and pheasants go missing. What is really alarming is the use of dogs and high-powered rifles to poach deer. FMD put a stop to all this. Now a neighbour has told me of poachers near to the village using rifles and shooting deer. The only people benefiting from this are the poachers and hoteliers who receive these dead beasts and no questions asked. Also the danger of villagers being hit by stray rifle shots causes alarm to others.\\n\\n\\nWeek 55\\nI think that there is a lot of jumping on the band wagon now that FMD has cleared up. For instance, I listened to an interview on the local radio station given by a hotelier. Things weren’t going well in his establishment. Having got over FMD and its implications, visitors were slowly returning to the area, but not in sufficient numbers to cause great joy. \\n\""
+      ]
+     },
+     "execution_count": 10,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "foot_mouth_df.iloc[5,2]       # maybe try foot_mouth_df.iloc[:5,1] for comparison?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Saving the accessed items as a new variable"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now, it is helpful to know how to save the things you access. Here is an example that sames all of the rows for just the column that contains the filenames into a new variable called 'filenames'. \n",
+    "\n",
+    "\n",
+    "Can you write some code to work with this new variable? Find its type? Or length? "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "filenames = foot_mouth_df.iloc[:,1]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "pandas.core.series.Series"
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "type(filenames)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "87"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "len(filenames)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Maybe try saving other things you accessed as new variables. A single row or range of rows? Multiple columns? One cell? A selection of cells? What type of object are they? Do they work the way you expect them to?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_variable = foot_mouth_df.        # what comes after the dot?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Processing\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_______________________________________________________________________________________________________________________________\n",
+    "\n",
+    "Processing steps\n",
+    "- Tokenisation, (or splitting text into various kinds of 'short things' that can be statistically analysed).\n",
+    "- Standardising the next (including converting uppercase to lower, correcting spelling, find-and-replace operations to remove abbreviations, etc.). \n",
+    "- Removing irrelevancies (anything from punctuation to stopwords like 'the' or 'to' that are unhelpful for many kinds of analysis).\n",
+    "- Consolidating (including stemming and lemmatisation that strip words back to their 'root'). \n",
+    "- Basic NLP (that put some of the small things back together into logically useful medium things, like multi-word noun or verb phrases and proper names).\n",
+    "\n",
+    "In practice, most text-mining work will require that any given corpus undergo multiple steps, but the exact steps and the exact order of steps depends on the desired analysis to be done. Thus, some of the examples that follow will use the raw text corpus as an input to the process while others use a processed corpus as an input. \n",
+    "\n",
+    "As a side note, it is good practice to create new variables whenever you manipulate an existing variable rather than write over the original. This means that you keep the original and can go back to it anytime you need to if you want to try a different manipulation or correct an error. You will see how this works as we progress through the processing steps. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Tokenisation"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Our first step is to cut our 'one big thing' into tokens, or 'lots of little things'. As an example, one project I worked involved downloading a file with hundreds of recorded chess games, which I then divided into individual text files with one game each. The games had a very standard format, with every game ending with either '1-0', '0-1' or '1/2-1/2'. Thus, I was able to use regular expressions (covered in more detail later) to iterate over the file, selecting everyithing until it found an instance of '1-0', '0-1' or '1/2-1/2', at which point it would cut what it had selected, write it to a blank file, save it, and start iterating over the original file again. \n",
+    "\n",
+    "Other options that might make more sense with other kinds of files would be to to cut and write from the large file to new files after a specified number of lines or characters. \n",
+    "\n",
+    "Whether you have one big file or many smaller ones, most text-mining work will also want to divide the corpus into what are known as 'tokens'. These 'tokens' are the unit of analysis, which might be chapters, sections, paragraphs, sentences, words, or something else. \n",
+    "\n",
+    "Since we have one file already loaded as a corpus, we can skip the right to tokenising that text into sentences and words. Both options are functions available through the ntlk package that we imported earlier. These are both useful tokens in their own way, so we will see how to produce both kinds. \n",
+    " \n",
+    "We start by dividing our corpus into words, splitting the string into substrings whenever 'word_tokenize' detects a word. \n",
+    "\n",
+    "Let's try that. But this time, let's just have a look at the first 100 things it finds instead of the entire text.\n",
+    "Run/Shift+Enter."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "foot_mouth_df['tokenized_sents'] = foot_mouth_df.apply(lambda row: nltk.word_tokenize(row['1']), axis=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "foot_mouth_df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\n",
+    "corpus_words = word_tokenize(corpus)                                     # Pass the corpus through word tokenize \n",
+    "print(corpus_words[:100])                                                 # the [:100] within the print statement says \n",
+    "                                                                         # to print only the first 100 items in the list  \n",
+    "print(\"...\")                                                             # the print(\"...\") just improves output readability\n",
+    "type(corpus_words)                                                       # Always good to know your variable type!\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let's have a look. \n",
+    "\n",
+    "We can see that corpus_words is a list of strings. We know it is a list because it starts and ends with square brackets and we know the things in that list are strings because they are surrounded by single quotes. \n",
+    "\n",
+    "We can also see that puctuation marks are counted as tokens in that list. For example, the full stop at the end of the first sentence appears as its own token because word_tokenize knows that it does not count as part of the previous word. Interestingly, 'U.K.' is all one token, despite having full stops in. Clever stuff, this tokenisation function!\n",
+    "\n",
+    "Word_tokenize is a useful function if you want to take a 'bag of words' approach to text-mining. This reduces a lot of the contextual information within the original corpus because it ignores how the words were used or in what order they originally appeared, making it easy to count how often each word occurrs. There is a surprising amount of insight to be gained here, but it does mean that 'building' in the next two sentences will be counted as the \"same\" word. \n",
+    "- \"He is building a diorama for a school project.\" where 'building' is a verb\n",
+    "- \"The building is a clear example of brutalist architecture.\" where 'building' is a noun\n",
+    "\n",
+    "There are other kinds of analyses that you could do if you want verb-building and noun-building to be counted as different words. That usually starts with tokenising differently, for example into sentences rather than words. \n",
+    "Let's see what that looks like by running the same basic analysis again, but this time with sentence-token things instead of word-token things. \n",
+    "\n",
+    "Do that funky Run/Shift+Enter thing! "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# importing sent_tokenize from nltk\n",
+    "from nltk import sent_tokenize\n",
+    "\n",
+    "# Same again, but this time broken into sentences\n",
+    "corpus_sentences = sent_tokenize(corpus)\n",
+    "print(corpus_sentences[:10])                                                  # Since these are sentences instead of words, \n",
+    "                                                                              # we only want the first 10 items instead of 100.\n",
+    "print(\"...\")                                                                  \n",
+    "type(corpus_sentences)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_______________________________________________________________________________________________________________________________\n",
+    "\n",
+    "Corpus_sentences is also a list of strings (starts and ends with square brackets, each item is surrounded by single quotes). \n",
+    "\n",
+    "This time, the full stops at the end of each sentence are included within the sentence token, which makes sense. \n",
+    "\n",
+    "Moving forward, some of the next steps make more sense to do on the word-tokens while others on sentence-tokens."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Standardising\n",
+    "#### Remove uppercase letters"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If we want to focus on the 'bag of words' approach, we don't really care about uppercase or lowercase distinctions. For example, we want 'Privacy' to count as the same word as 'privacy', rather than as two different words. \n",
+    "\n",
+    "We can remove all uppercase letters with a built in python command on corpus_words. Do this in the next code cell, again returning just the first 100 items instead of the whole thing. \n",
+    "\n",
+    "Do the Run/Shift+Enter thing. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# You can see that I created a new variable called corpus_lower rather than edit corpus_words directly.\n",
+    "# This means I can easily compare two different processes or correct something without going back and re-running earlier steps. \n",
+    "\n",
+    "corpus_lower = [word.lower() for word in corpus_words]\n",
+    "print(corpus_lower[:100])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_______________________________________________________________________________________________________________________________\n",
+    "Great! This is another step in the right direction. \n",
+    "\n",
+    "If you want a bit more practice, you can copy/paste/edit the command above to create a second version that applies to corpus_sentences instead of corpus_words. You will have to think for yourself whether this makes sense to do or not. Uppercase letters are potentially useful in an analysis that looks at sentences, but since the tokens already capture sentences, maybe that value is no longer useful. \n",
+    "\n",
+    "Anyway, have a go. Knock yourself out! "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "corpus_sent_lower = [sent.lower() for sent in corpus_sentences]\n",
+    "print(corpus_sent_lower[:100])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Spelling correction"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_______________________________________________________________________________________________________________________________\n",
+    "Everybody loves spelling... RIGHT?!?\n",
+    "\n",
+    "Fortunately, there are several decent spellchecking packages written for python. They are not automatically installed and ready to import in the same way that the 'os' or 'nltk' packages were, but we just need to install the packages and import the functions we need through an installer called 'pip'. You will see 'pip' in the next code block, but since this is in jupyter notebook rather than directly in a python shell, we need to put a '!' in front of the 'pip' function. Don't worry too much about that now, I just mention  it here in case you find it interesting to know. \n",
+    "\n",
+    "The next code cell:\n",
+    "- installs the 'autocorrect' package,\n",
+    "- imports the Speller function, and\n",
+    "- creates a one-word command that specifies that the Speller function should use English language. \n",
+    "\n",
+    "Run/Shift+Enter, as per usual. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "!pip install autocorrect\n",
+    "from autocorrect import Speller\n",
+    "check = Speller(lang='en')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_______________________________________________________________________________________________________________________________\n",
+    "Super. Creating that one-word command saves us some time, which is maybe less important here but is a good skill to be aware of if you are working on text-mining every day for weeks on end. Always be on the look out for good ways to save time. \n",
+    "\n",
+    "Moving on, we need to iterate over our corpus, checking and correcting each token. This is easy to do if you start with a new, empty list (I called mine 'corpus_correct_spell'). As I work through corpus_words, one token at a time, we append (which is just fancy for 'add to the end') the corrected word to our new blank list. \n",
+    "\n",
+    "Then, as usual, we have a quick look at the first 100 entries in the new 'corpus_correct_spell'. \n",
+    "\n",
+    "Run/Shift+Enter. You know how to do it. Don't worry if it takes a while... Checking the spelling on each word is not a cakewalk. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "corpus_correct_spell = []\n",
+    "\n",
+    "for word in corpus_words:\n",
+    "    corpus_correct_spell.append(check(word))    \n",
+    "\n",
+    "print(corpus_correct_spell[:100])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_______________________________________________________________________________________________________________________________\n",
+    "How did it do? Well, this spell-checker replaced 'haz' with 'had' rather than 'has'. That is ok, I guess. No automatic spelling correction programme will get it 100% right 100% of the time. Maybe your project has specific research questions that won't work with this decision. \n",
+    "\n",
+    "In that case, you would have to check out some other spell-checkers like textblob or pyspellchecker. You might even want to custom build or adapt your own spell-checker, especially if you were working with very non-standard text, like comment boards that use a bunch of slang, common typos, or specific terms. \n",
+    "\n",
+    "But take a moment here and consider the following questions... \n",
+    "- Can you apply this spell-checker to corpus_sentences rather than corpus_words? If you are not sure what happens, try it out by copying, editing and re-running the above code block. \n",
+    "- Should you have appled this spell-checker to corpus_lower rather than corpus_words? What difference would it make? Again, try it out if you are not sure. \n",
+    "\n",
+    "Next up, specific replacements with RegEx! "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sent_corpus_correct_spell = []\n",
+    "for sent in corpus_sentences:\n",
+    "    sent_corpus_correct_spell.append(check(sent))    \n",
+    "\n",
+    "print(sent_corpus_correct_spell[:100])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### RegEx replacements"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "RegEx stands for REGular EXpressions, which is probably familiar to you as the basis for how find-and-replace works in text documents. I mentioned this above when I talked about cutting up a large file into smaller files whenever the computer iterating over the large file found one of three specific combinations of numbers and symbols. \n",
+    "\n",
+    "But RegEx is actually stronger than that because you can use it to identify combinations of letters, numbers, symbols, spaces and more, some of which can be repeated more than once or can be optional. I won't go into RegEx too much more here, because that is a whole set of lessons on its own. But here are a couple of examples that you might find useful in a text like ours where we know that there are mixtures of numbers written as numbers, numbers spelled out, geographic abbreviations and more.\n",
+    "\n",
+    "As you might expect, do the Run/Shift+Enter thing. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "corpus_numbers = [re.sub(r\"ninety-six\", \"96\", word) for word in corpus_words]   # Defines a new variable create by substituting\n",
+    "                                                                                # '96' for 'ninety-six' in corpus_words\n",
+    "\n",
+    "print(corpus_numbers[:100])                                            # Prints the first 100 items in the newly created corpus\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Super! Now, this only works on 'ninety-six', but there might be other numbers spelled out in the text. We would have to look at it all to be sure, either manually or by using word frequency tables (we'll get to that). If we were to find some, we would have to revise our RegEx to capture more things and substitute them properly. \n",
+    "\n",
+    "One way to do that might be to define multiple terms to replace and what to replace them with. To do that, I searched on stack overflow and found a function written to multiple items by RegEx in a string. \n",
+    "\n",
+    "Run/Shift+Enter below!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def multiple_replace(dict, text):\n",
+    "  # Create a regular expression  from the dictionary keys\n",
+    "  regex = re.compile(\"(%s)\" % \"|\".join(map(re.escape, dict.keys())))\n",
+    "    \n",
+    "\n",
+    "  # For each match, look-up corresponding value in dictionary\n",
+    "  return regex.sub(lambda mo: dict[mo.string[mo.start():mo.end()]], text) \n",
+    "\n",
+    "if __name__ == \"__main__\": \n",
+    "\n",
+    "  dict = {\n",
+    "    \"CA\" : \"California\",\n",
+    "    \"United Kingdom\" : \"U.K\",\n",
+    "    \"United Kingdom of Great Britain\" : \"U.K\",\n",
+    "    \"United Kingdom of Great Britain and Northern Ireland\" : \"U.K\",\n",
+    "    \"UK\" : \"U.K\",\n",
+    "    \"Privacy Policy\" : \"noodle soup\",\n",
+    "  } \n",
+    "\n",
+    "corpus_replace = multiple_replace(dict, corpus)\n",
+    "\n",
+    "print(corpus_replace)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Uh-oh!\n",
+    "\n",
+    "It worked for \"The United Kingdom\" and \"the UK\" but for some reason:\n",
+    "* \"United Kingdom of Great Britain\" became \"U.K of Great Britain\" and \n",
+    "* \"United Kingdom of Great Britain and Northern Ireland\" became \"U.K of Great Britain and Northern Ireland \"\n",
+    "\n",
+    "\n",
+    "Let's try editing this!\n",
+    "What happens when we use lowercase letters instead of uppercase letters in \"United Kingdom\"? \n",
+    "\n",
+    "**Ans:**\"the United Kingdom\" stays untouched\n",
+    "\n",
+    "What happens if you change the order of the entries in 'dict'? For example What happens if you reverse the order of-\n",
+    "- \"United Kingdom of Great Britain and Northern Ireland\" : \"U.K.\", and \n",
+    "- \"United Kingdom of Great Britain\" : \"U.K.\", ? \n",
+    "\n",
+    "**Ans:** \"United Kingdom of Great Britain and Northern Ireland\" ACTUALLY gets changed to \"U.K\"! Interesting :)\n",
+    "\n",
+    "Okay so let's try doing this properly:\n",
+    "\n",
+    "(You should also feel free to add your own lines to 'dict' to exact some substitutions of your own.)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "if __name__ == \"__main__\": \n",
+    "\n",
+    "  dict = {\n",
+    "    \"CA\" : \"California\",\n",
+    "    \"United Kingdom of Great Britain and Northern Ireland\" : \"U.K\",\n",
+    "    \"United Kingdom of Great Britain\" : \"U.K\",\n",
+    "    \"United Kingdom\" : \"U.K\",\n",
+    "    \"UK\" : \"U.K\",\n",
+    "    \"ninety-six\": \"96\",\n",
+    "    \"Privacy Policy\": \"noodle soup\",\n",
+    "  } \n",
+    "\n",
+    "corpus_correct_replace = multiple_replace(dict, corpus)\n",
+    "\n",
+    "print(corpus_correct_replace)\n",
+    "# et voila it should work!\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "To Summarise: \n",
+    "> 1) Pay attention to capitalisation when trying to replace entries\n",
+    ">\n",
+    "> 2) The order of the entries matter, so put smaller terms (\"United Kingdom\") **after** the bigger term (\"United Kingdom of Great Britain\") otherwise you will run into issues!\n",
+    "\n",
+    "Note: this function works on strings, so I applied it to 'corpus' our original raw text. \n",
+    "We can either put a step like this as the first step in a pipeline, or we can adapt the code to iterate over a list of strings. Both have pros and cons. What do you think those pros and cons might be?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Removing irrelevancies"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Remove punctuation"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Punctuation is not always very useful for understanding text, especially if you look at words as tokens because lots of the punctuation ends up being tokenised on its own. \n",
+    "\n",
+    "We could use RegEx to replace all punctuation with nothing, and that is a valid approach. But, just for variety sake, I demonstrate another way here."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_______________________________________________________________________________________________________________________________\n",
+    "Forging ahead, let's filter out punctuation. We can define a string that includes all the standard English language punctuation, and then use that to iterate over corpus_words, removing anything that matches.\n",
+    "\n",
+    "But wait... Do we really want to remove the:\n",
+    "- hyphen in 'ninety-six' or words like 'lactose-free'? \n",
+    "- full stops in 'u.k.'? \n",
+    "- the apostrophe in contractions or possessives?\n",
+    "\n",
+    "There are no right or wrong answers here. Every project will have to decide, based on the research questions, what is the right choice for the specific context. In this case, we want to remove the full stops, even from 'u.k.' so that it becomes identical to 'uk'. \n",
+    "\n",
+    "But, at the same time, we don't necessarily want to remove dashes or apostrophes. Those are punctuation marks that occur in the middle of words and do add meaning to the word, so I want to keep them. \n",
+    "\n",
+    "Run/Shift+Enter, as is tradition. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "English_punctuation = \"!\\\"#$%&()*+,./:;<=>?@[\\]^_`{|}~“”\"      # Define a variable with all the punctuation to remove.\n",
+    "print(English_punctuation)                                     # Print that defined variable, just to check it is correct.\n",
+    "print(\"...\")                                                   # Print an ellipsis, just to make the output more readable.\n",
+    "\n",
+    "table_punctuation = str.maketrans('','', English_punctuation)  # The python function 'maketrans' creates a table that maps\n",
+    "print(table_punctuation)                                       # the punctation marks to 'None'. Print the table to check. \n",
+    "print(\"...\")                                                   # Just to be clear, '!' is 33 in Unicode, and '\\' is 34, etc.\n",
+    "                                                               # 'None' is python for nothing, not a string of the word \"none\".\n",
+    "    \n",
+    "corpus_no_punct = [w.translate(table_punctuation) for w in corpus_words]  \n",
+    "                                                               # Iterate over corpus_words, turning punctuation to nothing.\n",
+    "print(corpus_no_punct[:100])                                   # Print the 1st 100 items in corpus_no_punct to check."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_______________________________________________________________________________________________________________________________\n",
+    "Super! \n",
+    "\n",
+    "Do you want to try something else? How about you create a version that *does* filter out dashes and apostrophes. \n",
+    "\n",
+    "C'mon. You know you can do it. \n",
+    "\n",
+    "Take each of the steps above and copy/paste/edit them as needed. \n",
+    "- Create a copy of the line that defines the English_punctuation variable and edit it to define an All_English_Punctuation variable that includes more punctuation.\n",
+    "- Then create a copy of the line that defines the table_punctuation variable and have it create a table_all_punctuation variable.\n",
+    "- Then create a copy of the line that creates the corpus_no_punct variable and have it create an absolutely_no_punct variable.\n",
+    "- Then ask for the first 100 items of absolutely_no_punct. \n",
+    "\n",
+    "Feel free to change the variable names as you like. I am going for clarity, but you might prefer brevity. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "All_English_Punctuation= \"!\\\"#$%&()*+,./:;<=>?@[\\]^_`{|}~“”'-\"\n",
+    "print(All_English_Punctuation)\n",
+    "print(\"...\")\n",
+    "\n",
+    "table_all_punctuation = str.maketrans('','', All_English_Punctuation)\n",
+    "print(table_all_punctuation)\n",
+    "print(\"...\")\n",
+    "\n",
+    "corpus_no_punct = [w.translate(table_all_punctuation) for w in corpus_words]\n",
+    "print(corpus_no_punct[:100])\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Did you notice that removing the punctuation has left list items that are empty strings. Between 'corpus' and 'it', for example, is an item shown as ''. This is an empty string item that was a full stop before we removed the punctuation. \n",
+    "\n",
+    "Why do you think these empty string items are included in the output list? \n",
+    "Can you think of how we might remove this?\n",
+    "Since those empty strings are python-recognised instances of 'None',  python can find and filter them out. \n",
+    "\n",
+    "Let's give it a try. Run/Shift+Enter. Do it!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "corpus_no_space = list(filter(None, corpus_no_punct))     # This filters out the empty string from the no_punct list.\n",
+    "\n",
+    "print(corpus_no_space[:100])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now we are cooking with gas (unless that saying is no longer environmentally sustainable? Hmmm. ). \n",
+    "\n",
+    "But we are not done yet! Next up... Stopwords!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Stopwords"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Stopwords are typically conjunctions ('and', 'or'), prepositions ('to', 'around'), determiners ('the', 'an'), possessives ('s) and the like. The are **REALLY** common in all languages, and tend to occur at about the same ratio in all kinds of writing, regardless of who did the writing or what it is about. These words are definitely important for structure as they make all the difference between \"Freeze *or* I'll shoot!\" and \"Freeze *and* I'll shoot!\". \n",
+    "\n",
+    "Buuuut... Many for many text-mining analyses, especially those that take the bag of words approach, these words don't have a whole lot of meaning in and of themselves. Thus, we want to remove them. \n",
+    "\n",
+    "Let's start by downloading the basic stopwords function built into nltk and storing the English language ones in a list called, appropriately enough, 'stop_words'. \n",
+    "\n",
+    "Then let's have a look at what is in that list with a print command by doing the whole Run/Shift+Enter thing in the next two (two?!?) code cells. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "nltk.download('stopwords')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from nltk.corpus import stopwords\n",
+    "stop_words = set(stopwords.words('english'))\n",
+    "print(sorted(stop_words))\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_____________________________________________________________________________________________________________________________\n",
+    "Great. Now let's remove those stop_words by creating another list called corpus_no_stop_words. Then, we iterate over corpus_correct_spell, looking at them one by one and appending them to corpus_no_stop_words if and only if they do not match any of the items in the stop_words list. \n",
+    "\n",
+    "As you might expect, you should do the whole Run/Shift+Enter thing. Again. (I know, I know...)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "corpus_no_stop_words = []\n",
+    "\n",
+    "for word in corpus_lower:\n",
+    "    if word not in stop_words:\n",
+    "        corpus_no_stop_words.append(word)\n",
+    "        \n",
+    "        \n",
+    "print(corpus_no_stop_words[:100])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_______________________________________________________________________________________________________________________________\n",
+    "Hey now! That looks pretty good. Not perfect, but good.\n",
+    "\n",
+    "Want to try more? Run the same code above, but on 'corpus_words' rather than 'corpus_lower'. What happens? Why do you think that is?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "upper_corpus_no_stop_words = []\n",
+    "\n",
+    "for word in corpus_words:\n",
+    "    if word not in stop_words:\n",
+    "        upper_corpus_no_stop_words.append(word)\n",
+    "        \n",
+    "        \n",
+    "print(upper_corpus_no_stop_words[:100])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "So yeah, make sure to convert to lowercase before trying this!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Consolidation\n",
+    "#### Stemming words"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can probably imagine what comes next by now. We import a specific tool from nltk (it is not called the natural language tool kit for nuthin'), define a function, create a fresh new corpus by applying the function to an existing corpus, and print the first hundred items to have a nosey. \n",
+    "\n",
+    "Go ahead. Run/Shift+Enter"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from nltk.stem.porter import PorterStemmer\n",
+    "\n",
+    "porter = PorterStemmer()\n",
+    "corpus_stemmed = [porter.stem(word) for word in corpus_no_space]\n",
+    "print(corpus_stemmed[:100])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We see that 'sample' has become 'sampl', which collapses 'sampled' together with 'samples' and 'sampling' and 'sample'. This puts plurals and verb tenses all in the same form so they can be counted as instances of the \"same\" word.\n",
+    "\n",
+    "If we are happy with this stemming process, we might decide that we are done with the cleaning and can dive into the text-mining. \n",
+    "\n",
+    "Alternatively, we might decide to do a bit more cleaning, perhaps by downloading packages that replace contractions, so that 'haven't' would become 'have' and 'not'. There are many potentially useful changes like these that you may want to make. \n",
+    "\n",
+    "Buuuuuuuuuuuuuut... maybe we want to keep the count the verbs together and the nouns separetely? For that, we need the slightly more sophisticated approach of 'lemmatisation'. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Lemmatisation"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Lemmatisation is similar to stemming, in that it aims to turn various forms of the same word into a single form. However, lemmatisation is a bit more sophisticated because: \n",
+    "- It recognises irregular plurals and returns the correct singular form. Example = 'rocks' --> 'rock' but 'corpora' --> 'corpus' \n",
+    "- If part of speech tags are supplied, it treats verbs, adjectives and nouns differenly, even if they have the same surface form. Example - 'caring' would not be changed if used as an adjective (as in 'his caring manner') but would go to 'care' if it was a verb (as in 'he is caring for baby squirrels'. In contrast, stemming would remove the 'ing' and turn 'caring' into 'car'. \n",
+    "- If no part of speech tags are supplied, lemmatisation tools tend to assume words as nouns, so the process becomes a sophisticated de-pluraliser. \n",
+    "\n",
+    "Again, you import a specific tool from nltk, define a short form for its use, apply it to the relevant input variable, saving the output as a new variable with a suitable name. \n",
+    "\n",
+    "Once more, unto the Run/Shift+Enter!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "nltk.download('wordnet')\n",
+    "from nltk.corpus import wordnet\n",
+    "from nltk.stem import WordNetLemmatizer\n",
+    "lemmatizer = WordNetLemmatizer() \n",
+    " \n",
+    "print('rocks :', lemmatizer.lemmatize('rocks'))              #a few examples of lemmatising as a de-pluraliser\n",
+    "print('corpora :', lemmatizer.lemmatize('corpora'))\n",
+    "print('cares :', lemmatizer.lemmatize('cares'))              #no part of speech tag supplied, so 'cares' is treated as noun\n",
+    "print('caring :', lemmatizer.lemmatize('caring', pos = \"v\")) #when part of speech tag added, 'caring' is treated as verb             \n",
+    "print('cared :', lemmatizer.lemmatize('cared', pos = \"v\"))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The results show that our examples produce good output -  'rocks', 'corpora' and 'cares' are all de-pluralised correctly. The examples with part of speech tags also show that 'caring' and 'cared' are both correctly converted to 'care' as the base verb. \n",
+    "\n",
+    "Let's try it on our corpus, this time applying it to the 'corpus_no_space' variable, which has not had the stemming process applied to it. \n",
+    "\n",
+    "Run/Shift+Enter. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "corpus_lemmed = [lemmatizer.lemmatize(word) for word in corpus_no_space]\n",
+    "\n",
+    "print(corpus_lemmed[:100])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Well, the results are a bit mixed. There were no part of speech tags in our corpus, so everything was treated as nouns. The corpus has been effectively de-pluralised, but all of the different verb tenses remain. So, I guess we need to mark the corpus for part of speech tags, usually abbreviated to POS. \n",
+    "\n",
+    "But that is a topic for the next section!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Conclusions"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We have achieved a whole lot already! This is great work! \n",
+    "\n",
+    "Now, you will have to think carefully about:\n",
+    "- what processes you will need for the analysis you want to run, \n",
+    "- what is the right order of processes for your corpus/corpora and your research questions, and \n",
+    "- how will you keep track of which processes you run and in which order. Replicability demands clear step-by-steps!\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Further reading and resources"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Books, tutorials, package recommendations, etc. for Python\n",
+    "- Programming with Python for Social Scientists. Brooker, 2020. https://study.sagepub.com/brooker\n",
+    "- Automate the Boring Stuff with Python: Practical Programming for Total Beginners, Sweigart, 2019. ISBN-13: 9781593279929\n",
+    "- SentDex, python programming tutorials on YouTube https://www.youtube.com/user/sentdex\n",
+    "- nltk (Natural Language Toolkit) https://www.nltk.org/book/ch01.html\n",
+    "- nltk.corpus http://www.nltk.org/howto/corpus.html\n",
+    "- spaCy https://nlpforhackers.io/complete-guide-to-spacy/\n",
+    "\n",
+    "Books and package recommendations for R\n",
+    "- Quanteda, an R package for text analysis https://quanteda.io/​\n",
+    "- Text Mining with R, a free online book https://www.tidytextmining.com/​"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"text-align: right\"><a href=\"./tm-extraction-2020-06-16.ipynb\" target=_blank><i>Next section: Extracting text</i></a></div>"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.12"
+  },
+  "toc": {
+   "base_numbering": 1,
+   "nav_menu": {},
+   "number_sections": true,
+   "sideBar": true,
+   "skip_h1_title": true,
+   "title_cell": "Table of Contents",
+   "title_sidebar": "Contents",
+   "toc_cell": true,
+   "toc_position": {},
+   "toc_section_display": true,
+   "toc_window_display": false
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
