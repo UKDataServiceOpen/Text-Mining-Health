@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Lets go ahead and install all the necessary packages. 
 
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 # Install
 install.packages("tm")  # for text mining
 install.packages("SnowballC") # for text stemming
@@ -31,7 +31,9 @@ install.packages("tidytext") #for tokenisation, using dplyr, ggplot2 and other t
 install.packages("stringr") # for extracting matched patterns in strings
 install.packages("sparklyr") # tokenizer package
 install.packages("hunspell") # spell check tool
-install.packages("textstem") # lemmitisation
+install.packages("textstem") # lemitisation
+install.packages("udpipe") # POS tagging
+
 
 ```
 
@@ -54,6 +56,7 @@ library(stringr)
 library(sparklyr)
 library(hunspell)
 library(textstem)
+library(udpipe)
 
 ```
 
@@ -79,6 +82,7 @@ Obviously, we can access any column, row or cell without using named labels. But
 names(foot_mouth_df)[1] <- "Number"
 names(foot_mouth_df)[2] <- "Filename"
 names(foot_mouth_df)[3] <- "Everything_else"
+head(foot_mouth_df)
 ```
 
 
@@ -110,12 +114,12 @@ We access the column labelled 'everything_else' in our dataframe, and extract st
 ```{r}
 #Adding Date Column 
   # first to the diary file 
-diary_file$Date <- str_extract(diary_file$Everything_else, "(\\d{1,2}[/\\.-][ ]?)?(\\d{1,2}[ ]*[/\\.-]|January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Febr|Mar|Apr|Jun|Jul|Aug|Sept|Sep|Oct|Nov|Dec|Jan\\.|Feb\\.|Febr\\.|Mar\\.|Apr\\.|Jun\\.|Jul\\.|Aug\\.|Sept\\.|Sep\\.|Oct\\.|Nov\\.|Dec\\.)[ ]*[']?\\d{2,4}")
+diary_file$Date <- stringr::str_extract(diary_file$Everything_else, "(\\d{1,2}[/\\.-][ ]?)?(\\d{1,2}[ ]*[/\\.-]|January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Febr|Mar|Apr|Jun|Jul|Aug|Sept|Sep|Oct|Nov|Dec|Jan\\.|Feb\\.|Febr\\.|Mar\\.|Apr\\.|Jun\\.|Jul\\.|Aug\\.|Sept\\.|Sep\\.|Oct\\.|Nov\\.|Dec\\.)[ ]*[']?\\d{2,4}")
 
 head(diary_file)
 
   # then to the group/interview files
-group_int_file$Date <- str_extract(group_int_file$Everything_else, "(\\d{1,2}[/\\.-][ ]?)?(\\d{1,2}[ ]*[/\\.-]|January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Febr|Mar|Apr|Jun|Jul|Aug|Sept|Sep|Oct|Nov|Dec|Jan\\.|Feb\\.|Febr\\.|Mar\\.|Apr\\.|Jun\\.|Jul\\.|Aug\\.|Sept\\.|Sep\\.|Oct\\.|Nov\\.|Dec\\.)[ ]*[']?\\d{2,4}")
+group_int_file$Date <- stringr::str_extract(group_int_file$Everything_else, "(\\d{1,2}[/\\.-][ ]?)?(\\d{1,2}[ ]*[/\\.-]|January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Febr|Mar|Apr|Jun|Jul|Aug|Sept|Sep|Oct|Nov|Dec|Jan\\.|Feb\\.|Febr\\.|Mar\\.|Apr\\.|Jun\\.|Jul\\.|Aug\\.|Sept\\.|Sep\\.|Oct\\.|Nov\\.|Dec\\.)[ ]*[']?\\d{2,4}")
 
 head(group_int_file)
 ```
@@ -133,7 +137,6 @@ Another interesting piece of information to have, is the gender of the interview
 
 ```{r}
 # Adding Gender Column and remove colon 
-#unlist(lapply(strsplit(foo, ':', fixed = TRUE), '[', 2))
 new_foot_mouth$Gender <- str_extract(new_foot_mouth$Everything_else, "M|F")
 head(new_foot_mouth)
 ```
@@ -172,7 +175,7 @@ Our first step is to cut our 'one big thing' into tokens, or 'lots of little thi
 
 Whether you have one big file or many smaller ones, most text-mining work will also want to divide the corpus into what are known as 'tokens'. These 'tokens' are the unit of analysis, which might be chapters, sections, paragraphs, sentences, words, or something else.
 
-Since we have one file already loaded as a corpus, we can skip the right to tokenising that text into sentences and words. Both options are functions available through the .... package that we imported earlier. These are both useful tokens in their own way, so we will see how to produce both kinds.
+Since we have one file already loaded as a corpus, we can skip the right to tokenising that text into sentences and words. Both options are functions available through the *tidtext* package that we imported earlier. These are both useful tokens in their own way, so we will see how to produce both kinds.
 
 We start by dividing our corpus into words, splitting the string into substrings whenever 'word_tokenize' detects a word.
 
@@ -180,11 +183,11 @@ Let's try that. But this time, let's just have a look at the first 100 things it
 
 ```{r}
 #Since this method takes basically adding columns every time we do a new step, I will do processing on original foot_mouth_df
-# Then I will append anything usefuul onto the modified 'new_foot_mouth' DataFrame for the extraction process!
+# Then I will append anything usefuul onto the modified 'new_foot_mouth' DataFrame.
 
 # 1) Words 
 
-token_list <- foot_mouth_df %>% unnest_tokens(output = tokenised_words, 
+token_list <- foot_mouth_df %>% tidytext::unnest_tokens(output = tokenised_words, 
                    token = "words",
                    input = Everything_else)
 token_list
@@ -194,6 +197,44 @@ foot_mouth_token <- token_list %>%
 
 head(foot_mouth_token)
 ```
+
+
+## Creating a word frequency 
+
+The tidytext package provides a dataset called stop_words (what else) that contains a list of all the determiners and conjunctions, adverbs and adjectives that we can eliminate from a text, so we can analyse it properly.
+
+```{r}
+# We will create a function that will store all the operations to be able to plot the word frequency
+
+word_frequency <- function(x, top = 10){
+  x %>%
+# We need a word count
+  count(Word, sort = TRUE) %>%
+# We want to create a factor from the word column with the levels showing the most frequent words as top level
+# This is just for aestethic reasons, however, it helps make the point
+  mutate(Word = factor(Word, levels = rev(unique(Word)))) %>% 
+# We use the "top" variable defined in the function so we can decide how many words we want to use 
+  top_n(top) %>%
+# This will be useful later if we want to use a grouping variable and will do nothing if we don't  
+  ungroup() %>%
+# The graph itself
+  ggplot(mapping = aes(x = Word, y = n)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(x = NULL)
+}
+
+reviews_tidy <- foot_mouth_df %>%
+  tidytext::unnest_tokens("Word", "Everything_else") %>%
+  dplyr::anti_join(tidytext::stop_words, by = c("Word" = "word")) %>% 
+  mutate(Word = stringr::str_replace(Word, "'s", ""))
+
+# Now you can plot
+reviews_tidy %>%
+  word_frequency(15) 
+
+```
+
 
 
 Once this is complete you can then apend the new dataframe that contains the tokenisaion words to our 'foot_mout_df'
@@ -226,12 +267,12 @@ tolower(foot_mouth_df$tokenised_words)
 ## Spell check 
 
 
-We can use the hunspell_check and hunspell_suggest functions from the *hunspell* package to test indivial words
+We can use the hunspell_check and hunspell_suggest functions from the *hunspell* package to test individual words
 
 
 ```{r}
 #foot_mouth_df$spell_checked <-
-#hunspell(foot_mouth_df$Everything_else[2,])
+#hunspell(foot_mouth_df$Everything_else)
 
 ```
 
@@ -296,9 +337,6 @@ head(foot_mouth_df)
 
 
 
-
-
-
 ### Removing Stop Words 
 
 Stopwords are typically conjunctions ('and', 'or'), prepositions ('to', 'around'), determiners ('the', 'an'), possessives ('s) and the like. The are REALLY common in all languages, and tend to occur at about the same ratio in all kinds of writing, regardless of who did the writing or what it is about. These words are definitely important for structure as they make all the difference between "Freeze or I'll shoot!" and "Freeze and I'll shoot!".
@@ -311,7 +349,7 @@ For removing words in R it's a little awkward, but you can paste together a rege
 
 ```{r}
 
-stopwords_regex = paste(stopwords('en'), collapse = '\\b|\\b')
+stopwords_regex = paste(tm::stopwords('en'), collapse = '\\b|\\b')
 stopwords_regex = paste0('\\b', stopwords_regex, '\\b')
 
 foot_mouth_df$no_stop_words <-
@@ -341,7 +379,7 @@ This function either takes in a character vector and returns a character vector,
 ```{r}
 
 foot_mouth_df$stem_words <- 
-  stemDocument(foot_mouth_df$no_stop_words, language = "english")
+  tm::stemDocument(foot_mouth_df$no_stop_words, language = "english")
 
 head(foot_mouth_df)
 ```
@@ -354,12 +392,10 @@ Now it is time to tag that dataframe with POS-tags. This step is important becau
 
 This would then result in the Dataframe essentially going through a de-pluraliser, while all of the different verb tenses remain. So, before we lemmatise the Dataframe, we need to mark the corpus for part of speech tags, abbreviated to POS
 
+Information on the udpipe package: Ready-made models for 65 languages trained on 101 treebanks from https://universaldependencies.org/ are provided to you. Some of these models were provided by the UDPipe community. Other models were build using this R package. You can either download these models manually in order to use it for annotation purposes or use udpipe_download_model to download these models for a specific language of choice. You have the following options:
 
 
 ```{r}
-install.packages("udpipe")
-library(udpipe)
-
 udmodel <- udpipe_download_model(language = "english")
 udmodel <- udpipe_load_model(file = udmodel$file_model)
 
@@ -367,7 +403,7 @@ udmodel <- udpipe_load_model(file = udmodel$file_model)
 foot_mouth_df$pos_tags <- udpipe_annotate(udmodel, 
                      foot_mouth_df$no_spaces)
 
-head(foot_mouth_df$pos_tags)
+
 
 ```
 
@@ -385,18 +421,17 @@ Lemmatisation is similar to stemming, in that it aims to turn various forms of t
 
 ```{r}
 foot_mouth_df$lemm <- 
-  lemmatize_words(foot_mouth_df$pos_tags)
-
-head(foot_mouth_df$lemm)
-
+  textstem::lemmatize_words(foot_mouth_df$pos_tags)
 ```
 
 
 
 
-# Save new datafram 
+# Append and Save new datafram 
 
 ```{r}
+#proceessed_data <- left_join(new_foot_mouth, foot_mouth_df, by = c("Filename"))
+
 #save(foot_mouth_df, file = "processed_fm_data.RData")
 #load("processed_fm_data.RData"))
 ```
