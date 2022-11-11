@@ -64,7 +64,7 @@ library(udpipe)
 
 # Load in the dataset 
 
-We are going to be using the 'text.csv' which was created once combining all of the rtf files into one dataset. 
+We are going to be using the 'text.csv' which was created once combining all of the .rtf files into one dataset. 
 
 ```{r}
 foot_mouth_df <- read_csv("code/data/foot_mouth/text.csv")
