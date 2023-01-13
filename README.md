@@ -3,7 +3,6 @@
 
 # Text-Mining-Health
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2F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%40github.com%2FUKDataServiceOpen%2FText-Mining-Health.git/HEAD)
 
 What is text-mining? How can I use this method to extract important information from a large number of documents? What are its applications in the field of health?
 
