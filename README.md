@@ -3,6 +3,7 @@
 
 # Text-Mining-Health
 
+https://mybinder.org/v2/gh/UKDataServiceOpen/Text-Mining-Health/HEAD
 
 What is text-mining? How can I use this method to extract important information from a large number of documents? What are its applications in the field of health?
 
