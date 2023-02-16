@@ -32,6 +32,7 @@ install.packages("newsapi")
 install.packages("lubridate")
 install.packages("httr")
 install.packages("rvest")
+install.packages("dplyr")
 ```
 
 
@@ -45,6 +46,7 @@ library(newsAPI)
 library(lubridate)
 library(httr)
 library(rvest)
+library(dplyr)
 
 ```
 
@@ -75,21 +77,46 @@ Neat. Let's get started then.
 In the section under 'Import required modules' I mentioned that you'll need to visit this link https://newsapi.org/ and create a free account. So if you haven't done so, do it now! You can then generate your API key, which you will need to locate your news articles.
 
 
+## newsanchor package 
+
+Authentication
+You need an API key to access https://newsapi.org. You can apply for a key at https://newsapi.org/register/. It is common practice to set API keys in your R environment file. Hence, every time you start R the key is loaded. The functions get_headlines, get_headlines_all, get_everything, get_everything_all, and get_sources access your key automatically by executing Sys.getenv("NEWS_API_KEY"). Alternatively, you can provide an explicit definition of your api_key with each function call.
+
+In order to add your key to your environment file, you can use the function edit_r_environ from the usethis package.
+
+This will open your .Renviron file in your text editor. Now, you can add the following line to it:
+
+*https://github.com/CorrelAid/newsanchor* 
+
+
 ```{r}
-# Initialise the client class with your API key:
+install.packages("newsanchor")
+library(newsanchor)
 
-newsapi <-  NewsApiClient(api_key='cd716c442d1f48408aafb24eca509e2f')
-
-newsapi <- get_articles("bbcnews", apiKey = "e8a3751c8c1b48faacff56c1941e7a62")
-
-news <- get_articles("")
-
+# save the api_key in the .Renviron file
+usethis::edit_r_environ()
+#"NEWSAPI_KEY" = "cd716c442d1f48408aafb24eca509e2f")
 ```
 
 
+Save the file and restart R for the changes to take effect.
+
+If your .Renviron lives at a non-conventional place, you can also use the function set_api_key from the newsanchor package to add the API key to your environment file. The function below appends the key automatically to your R environment file. You will be prompted to enter your API key into a popup box.
+
+```{r}
+# save the api key in the .Renviron file
+set_api_key(path = '/Users/user/.Renviron')
+```
+
+Restart R again for changes to take effect
 
 
 
+## Start extracting the information we want 
+
+```{r}
+womens <- get_everything(query = "women super league AND WSL", language = "en")
+```
 
 
 
