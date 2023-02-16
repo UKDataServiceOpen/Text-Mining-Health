@@ -1,0 +1,105 @@
+---
+title: "Retrieval_1"
+output: html_document
+date: "2023-02-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# This notebook involves...
+
+The first basic text-mining step: data retrieval, and also includes a little bit of data processing and extraction using RegEx.
+
+
+```{r}
+# API key = cd716c442d1f48408aafb24eca509e2f
+```
+
+
+# The dataset...
+
+In this notebook, we won't be working with a pre-existing dataset, we'll be building one ourselves! We will be using an API and some webscraping to create a pandas DataFrame containing our online articles, and the text content that we wish to do some text-mining with. If that sounds weird, fear not, I'll explain as we go along.
+
+Below I've commented out some code that I no longer need, as I have already installed these packages. Go ahead and uncomment this code and make sure you install each one before you begin.
+
+
+```{r}
+install.packages("tidyverse")
+install.packages("newsapi")
+install.packages("lubridate")
+install.packages("httr")
+install.packages("rvest")
+```
+
+
+# Load required packages 
+
+The first package 'newsapi' requires you to go to the following link https://newsapi.org/ and create a free account. You can then generate your API key, which you will need to locate your news articles.
+
+```{r}
+library(tidyverse)
+library(newsAPI)
+library(lubridate)
+library(httr)
+library(rvest)
+
+```
+
+
+#Webscraping and APIs...
+
+Webscraping refers to the extraction of data from a website. This information is collected and then exported into a format that is more useful, perhaps a spreadsheet. Of course, we could just copy and paste this information manually into a spreadsheet, but that's time-consuming and unreasonable if we want to extract large amounts of data. Instead, we can use Python webscraping packages to access the information we want and display it in a logical format.
+
+API stands for 'Application programming interface', and refers to a mechanism that allows two software components to communicate with each other using a set of definitions and protocals. Basically, it allows two applications to talk to each other. For instance, think of your Weather app on your phone, this app software "talks" to the weather bureau's software system which contains the daily weather data. The result of this conversation is daily weather updates on your phone.
+
+Both webscraping (as a process) and APIs (as a set of procedures and protocals) share the same goal: to access web data. The former allows you to extract data from any website via scraping software, whilst the latter gives you direct access to the data you want. In this notebook I'll be using a combination of the two.
+
+
+#Retrieval - Womens Super League
+
+Text-Mining has four basic steps: retrieval, processing, extraction, and analysis. During the retrieval stage we retrieve information, i.e., we gather the text data that we wish to work with. In this case, we're looking for articles that focus on women's football, and in particular, the WSL (Women's Super League). I'd also like to build up a dataset which focuses on men's football too, which looks at the Premier League.
+
+
+#NewsAPI - initialisation
+
+So before I can even begin to think about webscraping, I need to locate some relevant data. I could just type "women's football WSL" into google and click on each individual link and try to scrape this data... but again, that's a) time-consuming b) uncreative. Instead, I did a brief google search "Scrape news articles Python" and came across NewsAPI. This API returns search results for current and historic news articles, and the results include information on: title, author, source, date, and url of the news article. It also allows you to input multiple terms so that you can grab as many relevant links as you can!
+
+Neat. Let's get started then.
+
+
+#Grab your API key
+
+In the section under 'Import required modules' I mentioned that you'll need to visit this link https://newsapi.org/ and create a free account. So if you haven't done so, do it now! You can then generate your API key, which you will need to locate your news articles.
+
+
+```{r}
+# Initialise the client class with your API key:
+
+newsapi <-  NewsApiClient(api_key='cd716c442d1f48408aafb24eca509e2f')
+
+newsapi <- get_articles("bbcnews", apiKey = "e8a3751c8c1b48faacff56c1941e7a62")
+
+news <- get_articles("")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

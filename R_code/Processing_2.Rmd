@@ -1,0 +1,508 @@
+---
+title: "Processing_1"
+output: html_document
+date: "2023-02-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Install and Load Packages
+
+Lets go ahead and install all the necessary packages. 
+
+```{r, echo=TRUE, eval=FALSE}
+# Install
+install.packages("tm")  # for text mining
+install.packages("SnowballC") # for text stemming
+install.packages("wordcloud") # word-cloud generator 
+install.packages("RColorBrewer") # color palettes
+install.packages("syuzhet") # for sentiment analysis
+install.packages("ggplot2") # for plotting graphs
+install.packages("dplyr")  # for data manipulationn
+install.packages("readr") # for reading in files
+install.packages("tidytext") #for tokenisation, using dplyr, ggplot2 and other tidy tools 
+install.packages("stringr") # for extracting matched patterns in strings
+install.packages("sparklyr") # tokenizer package
+install.packages("hunspell") # spell check tool
+install.packages("textstem") # lemitisation
+install.packages("udpipe") # POS tagging
+
+
+```
+
+and now load them in using the *library* function 
+
+```{r}
+# Load
+library(tm)
+library(SnowballC)
+library(wordcloud)
+library(RColorBrewer)
+library(syuzhet)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(tidytext)
+library(stringr)
+library(sparklyr)
+library(hunspell)
+library(textstem)
+library(udpipe)
+
+```
+
+
+# Read-in data
+
+
+```{r}
+# Read-in the csv we created in the previous notebook
+# We create a variable 'df' and use read_csv to convert the csv file into a DataFrame.
+df <- read_csv("Data/W_dataset.csv")
+df2 <- read_csv("Data/W_dataset.csv")
+
+## # Let's view the first few rows of the dataset
+head(df)
+
+```
+
+
+We also want to add in a row number for each article 
+
+```{r}
+# create sequence of number of size equal 
+# to the number of rows of dataframe
+row_id <- seq(1, nrow(df))
+df$row_id = row_id
+
+```
+
+
+
+
+# Processing
+
+This includes the following steps:
+
+1) Tokenisation: splitting raw data into various kinds of "short things" that can be statistically analysed 
+2) Standardising: includes converting case, correcting spelling, find-and-replace operations to remove abbreviations, RegEx etc)
+3) Removing irrelevancies: includes anything from punctuation to stopwords like 'the' or 'to' that are unhelpful for many kinds of analysis
+4) Consolidation: includes stemming and/or lemmatisation that strip words back to their 'root'
+5) Basic NLP: includes tagging, named entity recognition, and chunking.
+
+NOTE: In practice, most text-mining work will require that any given corpus undergo multiple steps, but the exact steps and the exact order of steps depends on the desired analysis to be done.
+
+Also, it is good practice to create new variables whenever you manipulate an existing variable rather than write over the original. This means that you keep the original and can go back to it anytime you need to if you want to try a different manipulation or correct an error. You will see how this works as we progress through the processing steps.
+
+
+# 7.1 Tokenisation
+
+Our first step is to cut our 'one big thing' into tokens, or 'lots of little things'. 
+
+Whether you have one big file or many smaller ones, most text-mining work will also want to divide the corpus into what are known as 'tokens'. These 'tokens' are the unit of analysis, which might be chapters, sections, paragraphs, sentences, words, or something else.
+
+Since we have one file already loaded as a corpus, we can skip the right to tokenising that text into sentences and words. Both options are functions available through the *tidtext* package that we imported earlier. These are both useful tokens in their own way, so we will see how to produce both kinds.
+
+We start by dividing our corpus into words, splitting the string into substrings whenever 'unnest_tokens' detects a word.
+
+Let's try that. But this time, let's just have a look at the first 100 things it finds instead of the entire text. Run/Shift+Enter.
+
+
+
+```{r}
+
+token_list <- df %>% tidytext::unnest_tokens(output = tokenised_words, 
+                   token = "words",
+                   input = Content)
+token_list
+
+df_tokenized_words <- token_list %>% 
+  aggregate(tokenised_words ~ row_id, FUN = function(token_list) sprintf("[%s]", toString(token_list))) %>%
+  as.list(strsplit(tokenised_words, "")[[(1)]])
+
+class(df$tokenised_words)
+head(df_tokenized_words)
+
+
+#This code first converts the Content column to a character type, and then uses unnest_tokens to tokenize the words in the Content column and store them in a new word column. The resulting data frame, df_tokens, contains one row for each word in the Content column. 
+
+
+## Let's have a closer look at the results, by focusing on one row of our Text column
+## Lets view the first 50 instances from from 0 
+head(df_tokenized_words$tokenised_words[1], 50)
+
+
+## Lets add the new tokenised words to the original 'df' 
+df <- merge(df, df_tokenized_words)
+
+
+```
+
+
+
+### Interesting...
+
+We can notice a few things.
+
+We can see that the output is a list of strings. We know it is a list because it starts and ends with square brackets and we know the things in that list are strings because they are surrounded by single quotes.
+
+Nice. Now we have identified a few further things that we might want to change.
+
+
+## Standardising
+
+If we want to focus on the 'bag of words' approach, we don't really care about uppercase or lowercase distinctions. For example, we want 'Football' to count as the same word as 'football', rather than as two different words.
+
+But we can remove all uppercase letters with the function 'tolower' under the base package 
+
+However, you may have noticed that the above tokenisation code has already returned our text as lowercase, so we do not need to do anything more. But if you're curious, the code to do so is listed here!
+
+### Lowercasing our tokens 
+
+```{r}
+df$lower_case <- tolower(df$tokenised_words)
+```
+
+
+## Spelling correction
+
+Another bit of standardising that we may want to do, is to ensure that we have no spelling errors. Fortunately, there are several decent spell checking packages written for R. 
+
+We can use the hunspell_check and hunspell_suggest functions from the *hunspell* package to test individual words
+
+```{r}
+#Identify misspelled words
+spelling_erros <- hunspell(df$lower_case)
+spelling_errors <- unique(unlist(spelling_erros))
+length(spelling_errors)
+
+head(spelling_errors, 70)
+```
+
+As we can see there area total of 1017 mispelled words as identified by the hunspell function. 
+
+You could manually suggest alternative to the identifes words via the "hunspell_suggest" 
+
+```{r}
+suggested <- hunspell_suggest(spelling_errors, dict = dictionary("en_gb"))
+head(suggested, 70)
+
+```
+
+Note the first word is typically the best alternative. So you cold, therefore, construct a list of corrected words for the corresponding misspelled words. Clearly, some words are not the best choice. But overall, we can improve the quality of data after correction.
+
+```{r}
+#pick the first suggestion 
+spelling_dict <- unlist(lapply(suggested, function(x) x[1]))
+spelling_dict <- as.data.frame(cbind(spelling_errors,suggested))
+
+
+spelling_dict$spelling_pattern <- paste0("\\b", spelling_dict$spelling_errors, "\\b")
+head(spelling_dict)
+
+
+#save spelling dictionary 
+#write.csv(x = spelling_dict, file = "Data/output_data/spelling_dict.csv", 
+          fileEncoding = "utf8", row.names = F)
+
+```
+
+
+## Pasre features 
+
+
+```{r}
+
+tokens <- unnest_tokens(tbl = df, output = token, 
+                       input = Content, 
+                       token = stringr::str_split, 
+                       pattern = "  |\\, |\\.|\\, |\\;")
+
+tokens$token <- trimws(tokens$token, 
+                       which = c("both", "left", "right"), 
+                       whitespace = "[ \t\r\n]")
+
+
+## remove empty features
+library(stringi)
+tokens <- tokens[!tokens$token == "",]
+tokens$corrected <- stri_replace_all_regex(str = tokens$token, 
+                                             pattern = spelling_dict$spelling_pattern, 
+                                             replacement = spelling_dict$suggested, 
+                                             vectorize_all = FALSE)
+
+
+
+
+df$spell_checked <- hunspell(df$lower_case)
+```
+
+
+
+# To see if it's worked let's compare the spellchecked list above, to the original list
+
+```{r}
+head(df$lower_case[1], 50)
+
+head(df$spell_checked[1], 50)
+
+
+class(df$spell_checked)
+```
+
+
+
+# Removing irrelevancies 
+
+In this section we will identify how to remove;
+
+1) punctuation 
+2) empty spaces 
+3) stop words 
+
+## Punctuation
+
+Depending on your analysis, you may or may not want to remove some things that are present in text but irrelevant to your purposes. Let's start with punctuation.
+
+
+```{r}
+# Removing Punction
+df$no_punct <- 
+  str_replace_all(df$lower_case, "[[:punct:]]", "")
+
+head(df$punct)
+
+```
+
+
+If you were interested in removing non-alphanumeric characters, the reg ex exprresion is as follows *"[^[:alnum:]]", ""*
+
+
+```{r}
+#Remove Non-Alphanumeric characters 
+
+#foot_mouth_df$no_alpha_num <- 
+  #str_replace_all(foot_mouth_df$Everything_else, "[^[:alnum:]]", "")
+  
+```
+
+
+I will demonstrate another way here because you may have noticed that the new variable actually removes all commmos from the words, which removes the tokens we made earlier. So we can define a string that includes all the standard English language punctuation, and then use that to iterate over the relevant DataFrame column, removing anything that matches.
+
+But wait... Do we really want to remove the:
+
+- hyphens in things like 'ninety-six' or words like 'lactose-free'?
+- full stops in things like 'u.k.'?
+- the apostrophe in contractions or possessives?
+
+There are no right or wrong answers here. Every project will have to decide, based on the research questions, what is the right choice for the specific context. In this case, we want to remove the full stops, even from 'u.k.' so that it becomes identical to 'uk'.
+
+But, at the same time, we don't necessarily want to remove apostrophes. That is a punctuation mark that occurs in the middle of words and do add meaning to the word, so I want to keep them.
+
+
+```{r}
+# First, let's define a variable with all the punctuation to remove.
+
+English_punctuation <- "!\"#$%&()*+,./:;<=>?@[\\]^_`{|}~“”-"
+cat(English_punctuation)
+
+#Note that the escape sequence \\ is used to escape the square brackets [], which have a special meaning in R.
+
+```
+
+
+```{r}
+#Next, you can define the remove_punctuation function as follows:
+remove_punctuation <- function(x) {
+  gsub(English_punctuation, "", x, fixed = TRUE)
+}
+
+#In this code, the gsub function is used to replace all instances of the characters in English_punctuation with an empty string. The argument fixed = TRUE is used to indicate that English_punctuation is a fixed pattern, rather than a regular expression.
+
+#Finally, you can use the sapply function to iterate over the relevant column of the DataFrame and remove the punctuation, as follows: we'll call this variable 'no_punct_2'
+
+df$no_punct_2 <- sapply(df$lower_case, remove_punctuation)
+
+```
+
+
+
+
+
+## Removing empty spaces 
+
+Did you notice that removing the punctuation has left list items that are empty strings. Between 'corpus' and 'it', for example, is an item shown as ''. This is an empty string item that was a full stop before we removed the punctuation.
+
+We can again use the str_replace_all function from the *stringry* package to replace all intances of empty spaces
+
+
+```{r}
+
+df$no_punct_no_spaces <- 
+  str_replace_all(df$no_punct_2, " ", repl ="")
+
+head(df$no_punct_no_spaces[1], 50)
+
+```
+
+But we can also use list comprehension to filter each instance of 'None' and remove it from each row. First start by creating a new column named 'no_punct_no_spaces' 
+
+
+```{r}
+df$no_punct_no_space_2 <- sapply(df$no_punct, function(x) Filter(Negate(is.null), x))
+
+#lets view this 
+head(df$no_punct_no_spaces[1], 50)
+
+```
+
+
+
+
+
+
+### Removing Stop Words 
+
+Stopwords are typically conjunctions ('and', 'or'), prepositions ('to', 'around'), determiners ('the', 'an'), possessives ('s) and the like. The are REALLY common in all languages, and tend to occur at about the same ratio in all kinds of writing, regardless of who did the writing or what it is about. These words are definitely important for structure as they make all the difference between "Freeze or I'll shoot!" and "Freeze and I'll shoot!".
+
+Buuuut... Many for many text-mining analyses, especially those that take the bag of words approach, these words don't have a whole lot of meaning in and of themselves. Thus, we want to remove them.
+
+For removing words in R it's a little awkward, but you can paste together a regex from tm's stopword list.
+
+
+```{r}
+
+stopwords_regex = paste(tm::stopwords('en'), collapse = '\\b|\\b')
+stopwords_regex = paste0('\\b', stopwords_regex, '\\b')
+
+df$no_stop_words <-
+  stringr::str_replace_all(df$no_punct_no_space_2, stopwords_regex, '')
+
+head(df$no_stop_words)
+```
+
+
+
+
+# Consolidation
+
+
+This includes includes stemming and/or lemmatisation that strip words back to their 'root'.
+
+In this section we will look at 
+
+1) stemming 
+2) pos tagging 
+3) lemmitisation 
+
+
+### Stemming 
+
+Stemming aggressively strips back word markers, like verb endings and plurals in sort of very basic way using rules like “remove ed from words that end in ed or remove s from words that end in s.” Putting our text through a stemmer returns a new list with plurals and verb endings removed. 
+ 
+The tm package in R provides the stemDocument() function to stem the document to it's root.
+
+This function either takes in a character vector and returns a character vector, or takes in a PlainTextDocument and returns a PlainTextDocument
+
+```{r}
+
+df$stem_words <- 
+  tm::stemDocument(df$no_stop_words, language = "english")
+
+head(df$stem_words[1], 30)
+```
+
+
+
+## POS Tagging
+
+Now it is time to tag that dataframe with POS-tags. This step is important because without POS-tags, everything by default will get treated like a noun.
+
+This would then result in the Dataframe essentially going through a de-pluraliser, while all of the different verb tenses remain. So, before we lemmatise the Dataframe, we need to mark the corpus for part of speech tags, abbreviated to POS
+
+
+```{r}
+library(NLP) 
+library(openNLP) #You need to install Java for this package to work; http://www.java.com 
+
+#Create a function that applies a tag to each word. 
+tagPOS <-  function(x, ...) {
+s <- as.String(x)
+word_token_annotator <- Maxent_Word_Token_Annotator()
+a2 <- Annotation(1L, "sentence", 1L, nchar(s))
+a2 <- annotate(s, word_token_annotator, a2)
+a3 <- annotate(s, Maxent_POS_Tag_Annotator(), a2)
+a3w <- a3[a3$type == "word"]
+POStags <- unlist(lapply(a3w$features, `[[`, "POS"))
+POStagged <- paste(sprintf("%s/%s", s[a3w], POStags), collapse = " ")
+list(POStagged = POStagged, POStags = POStags)}
+
+str <- "this is a the first sentence."
+tagged_str <-  tagPOS(str)
+
+df$pos_tags <- tagPOS(df$no_punct_no_spaces)
+
+
+head(df$pos_tags[1], 30)
+
+```
+
+
+There are various other packages you could use to obtain the pos tags, for example the "udpipe" package. I found that this package is difficult when working with lists within columns, I was not able to apply the tags correctly when the list contained one word.
+
+However, information on the udpipe package, which contains ready-made models for 65 languages trained on 101 treebanks from https://universaldependencies.org/.  Some of these models were provided by the UDPipe community. Other models were build using this R package. You can either download these models manually in order to use it for annotation purposes or use udpipe_download_model to download these models for a specific language of choice. 
+
+
+
+
+
+## Lemmatisation 
+
+Lemmatisation is similar to stemming, in that it aims to turn various forms of the same word into a single form. However, lemmatisation is a bit more sophisticated because:
+
+- It recognises irregular plurals and returns the correct singular form. Example = 'rocks' --> 'rock' but 'corpora' --> 'corpus'
+- If part of speech tags are supplied, it treats verbs, adjectives and nouns differenly, even if they have the same surface form. Example - 'caring' would not be changed if used as an adjective (as in 'his caring manner') but would go to 'care' if it was a verb (as in 'he is caring for baby squirrels'. In contrast, stemming would remove the 'ing' and turn 'caring' into 'car'.
+- If no part of speech tags are supplied, lemmatisation tools tend to assume words as nouns, so the process becomes a sophisticated de-pluraliser.
+- This is better for this research because since we will be looking into the meaning of the data, it will need to put into the most accurate base form as possible, if I were to stem this, a lot of words would lose meaning!
+
+
+```{r}
+df$lemm <- 
+  textstem::lemmatize_words(df$pos_tags)
+```
+
+
+# Append and Save new datafram 
+
+```{r}
+#proceessed_data <- left_join(new_foot_mouth, foot_mouth_df, by = c("Filename"))
+
+#save(foot_mouth_df, file = "processed_fm_data.RData")
+#load("processed_fm_data.RData"))
+```
+
+
+
+#Conclusion 
+
+
+Extraction prep - check the code
+We're essentially done with the processing stage now. But we have a number of columns, and it would be a bit messy to look at if we were to use all of them. So let's select the "no_stop_words" for now 
+
+NOTE: When conducting your own text-mining project, there's no need (ofc) to create every single column as we have done. This has mainly been done for demonstration purposes. It's going to be up to you and your research aims to decide which pre-processing + processing steps you need to apply to build your perfect DataFrame.
+
+Now you can move onto the extraction stage!
+
+
+## Activity 
+
+
+NOTE: We can follow the same steps for the Men's Premier League dataset too. For the sake of demonstration purposes I have only processed the Women's Super League dataset. 
+
+
+
+
+
+
